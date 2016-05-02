@@ -30,7 +30,7 @@ public class ResourceCoordinator extends BaseClass {
 	}
 	
 	public CompleteResourceModel getMyResources(){
-		CompleteResourceModel resourceModel = new CompleteResourceModel(_self.gas(), _self.minerals());
+		CompleteResourceModel resourceModel = new CompleteResourceModel(_self.minerals(), _self.gas());
 		
 		return resourceModel;
 	}

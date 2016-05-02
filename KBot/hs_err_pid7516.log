@@ -63,8 +63,8 @@ C  [bwapi_bridge2_4.dll+0x87c17]
 j  bwapi.Unit.getDistance_native(JLbwapi/Unit;)I+0
 j  bwapi.Unit.getDistance(Lbwapi/Unit;)I+6
 j  ListUtils.ListUtils.getClosestUnit(Ljava/util/List;Lbwapi/Unit;Lbwapi/UnitType;)Lbwapi/Unit;+51
-j  unit.pack.Worker.sendToGatherMinerals(Lbwapi/Unit;)V+13
-j  unit.pack.Worker.runWorkers()V+47
+j  unit.pack.WorkerCoordinator.sendToGatherMinerals(Lbwapi/Unit;)V+13
+j  unit.pack.WorkerCoordinator.runWorkers()V+47
 j  Main.onFrame()V+137
 j  bwapi.AIModule.onFrame()V+11
 v  ~StubRoutines::call_stub
@@ -95,8 +95,8 @@ Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
 j  bwapi.Unit.getDistance_native(JLbwapi/Unit;)I+0
 j  bwapi.Unit.getDistance(Lbwapi/Unit;)I+6
 j  ListUtils.ListUtils.getClosestUnit(Ljava/util/List;Lbwapi/Unit;Lbwapi/UnitType;)Lbwapi/Unit;+51
-j  unit.pack.Worker.sendToGatherMinerals(Lbwapi/Unit;)V+13
-j  unit.pack.Worker.runWorkers()V+47
+j  unit.pack.WorkerCoordinator.sendToGatherMinerals(Lbwapi/Unit;)V+13
+j  unit.pack.WorkerCoordinator.runWorkers()V+47
 j  Main.onFrame()V+137
 j  bwapi.AIModule.onFrame()V+11
 v  ~StubRoutines::call_stub

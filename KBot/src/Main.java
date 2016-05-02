@@ -1,21 +1,23 @@
 import bwapi.*;
 import bwta.BWTA;
-import bwta.BaseLocation;
 import listUtils.pack.CodeProfiler;
 import listUtils.pack.ListUtils;
 import listUtils.pack.Painter;
 import resource.pack.ResourceCoordinator;
-import terran.pack.TerranSupplyDepot;
+import terran.pack.*;
 import unit.pack.*;
 import base.TimeManager;
-import base.Tuple;
 import builder.pack.*;
 
 public class Main extends DefaultBWListener {
     private Mirror mirror = new Mirror();
     private Game game;
     private Player self;
-    
+
+
+    private int frameCounter = 0;
+    private int secondCounter = 0;
+
     public void run() {
         mirror.getModule().setEventListener(this);
         mirror.startGame();
@@ -31,19 +33,25 @@ public class Main extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         game.enableFlag(1);
-        TimeManager.getInstance();
 
-        int i = 0;
+        TimeManager.getInstance();
 
         ListUtils._game = game;
         ListUtils._self = self;
-        
-        Worker.getInstance().init(game, self);
+
+        // Register components
         WorkerCoordinator.getInstance().init(game, self);
         Painter.getInstance().init(game,self);
         BuilderCoordinator.getInstance().init(game,self);
         BuilderSupplyCoordinator.getInstance().init(game, self);
+        BuildLogicsCoordinator.getInstance().init(game,self);
         ResourceCoordinator.getInstance().init(game, self);
+
+        TerranRefinery.getInstance().init(game,self);
+        TerranSupplyDepot.getInstance().init(game,self);
+        TerranBarracks.getInstance().init(game,self);
+        TerranCommandCenter.getInstance().init(game,self);
+        //End register
 
         System.out.println("Analyzing map...");
         BWTA.readMap();
@@ -53,20 +61,44 @@ public class Main extends DefaultBWListener {
 
     @Override
     public void onFrame() {
-    	
-    	CodeProfiler.startMeasuring("Builder");
-        BuilderCoordinator.getInstance().runCoordinator();
-        CodeProfiler.endMeasuring("Builder");
-        
-        CodeProfiler.startMeasuring("Supply");
-        BuilderSupplyCoordinator.getInstance().runCoordinator(game, self);
-        CodeProfiler.endMeasuring("Supply");
-        
-    	CodeProfiler.startMeasuring("Worker");
-    	Worker.getInstance().runWorkers();
-    	CodeProfiler.endMeasuring("Worker");
-    	
-        Painter.getInstance().paintAll();
+        try {
+            frameCounter = game.getFrameCount();
+            secondCounter = frameCounter / 30;
+
+            if(getFrames() % 8 == 0){
+                CodeProfiler.startMeasuring("Builder");
+                BuilderCoordinator.getInstance().runCoordinator();
+                CodeProfiler.endMeasuring("Builder");
+            }
+
+            if(getFrames() % 9 == 0) {
+                CodeProfiler.startMeasuring("Supply");
+                BuilderSupplyCoordinator.getInstance().runCoordinator();
+                CodeProfiler.endMeasuring("Supply");
+            }
+
+            if(getFrames() % 11 == 0) {
+                CodeProfiler.startMeasuring("WorkerCoordinator");
+                WorkerCoordinator.getInstance().runWorkers();
+                CodeProfiler.endMeasuring("WorkerCoordinator");
+            }
+
+            if(getFrames() % 12 == 0){
+                CodeProfiler.startMeasuring("BuildingAnalyzer");
+                TerranBuildingAnalyzer.getInstance().runAnalyzer();
+                CodeProfiler.endMeasuring("BuildingAnalyzer");
+            }
+
+            Painter.getInstance().paintAll();
+        }
+        catch (Exception ex){
+            System.out.println("---------------------");
+            System.out.println(" Error occurred with message: " + ex.getMessage());
+        }
+    }
+
+    public int getFrames() {
+        return frameCounter;
     }
 
     public static void main(String[] args) {

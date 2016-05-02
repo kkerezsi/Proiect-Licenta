@@ -5,14 +5,10 @@ public class Building {
 	
 	private UnitType _unitType;
 	private boolean _isBuilt;
-	private int _minutes;
-	private int _seconds;
-	
-	public Building(UnitType unitType,boolean isBuilt,int minutes,int seconds){
+
+	public Building(UnitType unitType,boolean isBuilt){
 		this._unitType = unitType;
 		this._isBuilt = isBuilt;
-		this._minutes = minutes;
-		this._seconds = seconds;
 	}
 	
 	public UnitType get_unitType() {
@@ -27,16 +23,10 @@ public class Building {
 	public void set_isBuilt(boolean _isBuilt) {
 		this._isBuilt = _isBuilt;
 	}
-	public int get_minutes() {
-		return _minutes;
-	}
-	public void set_minutes(int _minutes) {
-		this._minutes = _minutes;
-	}
-	public int get_seconds() {
-		return _seconds;
-	}
-	public void set_seconds(int _seconds) {
-		this._seconds = _seconds;
+
+	public boolean isSpecialBuilding() {
+		return get_unitType() == UnitType.Terran_Refinery
+				|| get_unitType() == UnitType.Terran_Bunker
+				|| get_unitType() == UnitType.Terran_Command_Center;
 	}
 }

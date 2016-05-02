@@ -3,24 +3,17 @@ package builder.pack;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.omg.CORBA._PolicyStub;
-
 import base.BaseClass;
-import bwapi.Game;
-import bwapi.Player;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 import listUtils.pack.ListUtils;
-import unit.pack.Worker;
+import unit.pack.WorkerCoordinator;
 
 public class BuilderSupplyCoordinator extends BaseClass {
 	private static BuilderSupplyCoordinator _instance;
-	private List<Integer> _currentNrOfWorkers;
-	
+
 	private BuilderSupplyCoordinator(){
-		_currentNrOfWorkers = new ArrayList<Integer>();
-		_currentNrOfWorkers.add(0);
 	}
 	
 	public static BuilderSupplyCoordinator getInstance(){
@@ -31,11 +24,13 @@ public class BuilderSupplyCoordinator extends BaseClass {
 		return _instance;
 	}
 	
-	public void runCoordinator(Game game,Player self){
-		List<Unit> supplyBuilders = ListUtils.getAllIdleUnitsByType(UnitType.Terran_Command_Center, self.getUnits());
+	public void runCoordinator(){
+		List<Unit> supplyBuilders = ListUtils.getMyCommandCenters();
 		
 		for (int i = 0; i < supplyBuilders.size(); i++) {
-			if(Worker.getInstance().areMinerWorkersRequired() || Worker.getInstance().areGasWorkersRequired()){
+			if(WorkerCoordinator.getInstance().areMinerWorkersRequired(i)
+					|| WorkerCoordinator.getInstance().areGasWorkersRequired(i)
+					|| WorkerCoordinator.getInstance().areScoutsRequired()){
 				supplyBuilders.get(i).train(UnitType.Terran_SCV);
 			}
 		}

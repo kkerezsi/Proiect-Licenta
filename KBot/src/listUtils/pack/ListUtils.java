@@ -1,7 +1,6 @@
 package listUtils.pack;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+
 import bwapi.*;
 
 public class ListUtils {
@@ -9,7 +8,7 @@ public class ListUtils {
 	public static Player _self;
 	
 	public static List<Unit> getAllUnitsByType(UnitType type,Player player){
-		List<Unit> filteredUnits = new ArrayList<Unit>();
+		List<Unit> filteredUnits = new ArrayList<>();
 		for (Unit u : player.getUnits()) {
 			if(u.getType() == type)
 				filteredUnits.add(u);
@@ -179,7 +178,7 @@ public class ListUtils {
 		return objectsOfThisType;
 	}
 	
-	public double getDistanceBetween(int x1, int y1, int x2, int y2) {
+	public static double getDistanceBetween(int x1, int y1, int x2, int y2) {
 		return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) / 32;
 	}
 
@@ -218,5 +217,126 @@ public class ListUtils {
 	public static int getNumberOfBattleUnitsCompleted() {
 		return getNumberOfInfantryUnitsCompleted() + +getNumberOfVehicleUnitsCompleted()
 				+ getNumberOfShipUnitsCompleted();
+	}
+
+	public static Unit getUnitNearestFromList(int x, int y, Collection<Unit> units,
+									   boolean includeGroundUnits, boolean includeAirUnits) {
+		double nearestDistance = 999999;
+		Unit nearestUnit = null;
+
+		for (Unit otherUnit : units) {
+			if (!otherUnit.isCompleted()) {
+				continue;
+			}
+
+			UnitType type = otherUnit.getType();
+			if (type == UnitType.Zerg_Larva) {
+				continue;
+			}
+
+			boolean isAirUnit = type.isFlyer();
+			if (isAirUnit && !includeAirUnits) {
+				continue;
+			} else if (!isAirUnit && !includeGroundUnits) {
+				continue;
+			}
+
+			double distance = getDistanceBetween(otherUnit.getX(), otherUnit.getY(), x, y);
+			if (distance < nearestDistance) {
+				nearestDistance = distance;
+				nearestUnit = otherUnit;
+			}
+		}
+
+		return nearestUnit;
+	}
+
+    public static Unit getNearestWorkerTo(TilePosition place) {
+        return getUnitNearestFromList(place.getX(), place.getY(), _self.getUnits(), true, false);
+    }
+
+    public static ArrayList<Unit> getUnitsInRadius(TilePosition point, double tileRadius,
+                                            Collection<Unit> unitsList) {
+        HashMap<Unit, Double> unitToDistance = new HashMap<>();
+
+        for (Unit unit : unitsList) {
+            double distance = getDistanceBetween(unit.getX(), unit.getY(), point.getX(), point.getY());
+            if (distance <= tileRadius) {
+                unitToDistance.put(unit, distance);
+            }
+        }
+
+        // Return listed sorted by distance ascending.
+        ArrayList<Unit> resultList = new ArrayList<>();
+        resultList.addAll(sortByValue(unitToDistance, true).keySet());
+        return resultList;
+    }
+
+    private static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map,
+                                                                              boolean ascending) {
+        final int compareModifier = ascending ? 1 : -1;
+        java.util.List<Map.Entry<K, V>> list = new LinkedList<>(
+                map.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return compareModifier * (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    public static ArrayList<Unit> getUnitsBuildings(Player self) {
+        ArrayList<Unit> objectsOfThisType = new ArrayList<>();
+
+        for (Unit unit : _self.getUnits()) {
+            if (unit.getType().isBuilding()) {
+                objectsOfThisType.add(unit);
+            }
+        }
+
+        return objectsOfThisType;
+    }
+
+	public static List<Unit> getMyCommandCenters(){
+		ArrayList<Unit> commandCenters = new ArrayList<>();
+
+		for (Unit u :
+				_self.getUnits()) {
+			if(u.getType() == UnitType.Terran_Command_Center)
+				commandCenters.add(u);
+		}
+
+		return commandCenters;
+	}
+
+	public static Unit getRandomBase() {
+		List<Unit> commandCenters = getMyCommandCenters();
+		if(commandCenters.size() == 0)
+			return null;
+
+		int randomCenterIndex = RandomProvider.randInt(0, commandCenters.size());
+
+		return commandCenters.get(randomCenterIndex);
+	}
+
+	public static List<Unit> getNearestUnitsTo(TilePosition tile, UnitType unitType, double searchRange) {
+
+		ArrayList<Unit> nearestUnits = new ArrayList<>();
+
+		for (Unit unit :
+				_self.getUnits()) {
+			if(unit.getType() == unitType &&
+					getDistanceBetween(tile.getX(),tile.getY(), unit.getX(), unit.getY()) <= searchRange){
+				nearestUnits.add(unit);
+			}
+		}
+
+		return  nearestUnits;
 	}
 }

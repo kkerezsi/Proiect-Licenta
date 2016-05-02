@@ -1,25 +1,24 @@
 package unit.pack;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import base.BaseClass;
 import bwapi.*;
+import constants.pack.Requirements;
+import listUtils.pack.ListUtils;
 
 public class WorkerCoordinator extends BaseClass {
-	private static WorkerCoordinator _instance;
-	private ArrayList<Unit> workerList;
-	
-	//base miners
-	private ArrayList<ArrayList<Unit>> _baseMiners;
-	
-	//base extractors
-	private ArrayList<ArrayList<Unit>> _baseExtractors;
-	
-	//base builders
-	private ArrayList<ArrayList<Unit>> _baseBuilders;
+	private static WorkerCoordinator _instance = null;
+	private ArrayList<Integer> _currentNrOfMinerWorkers;
+	private ArrayList<Integer> _currentNrOfGasWorkers;
 	
 	private WorkerCoordinator(){
-		workerList = new ArrayList<Unit>();
+		_currentNrOfMinerWorkers = new ArrayList<>();
+		_currentNrOfMinerWorkers.add(0);
+
+		_currentNrOfGasWorkers = new ArrayList<>();
+		_currentNrOfGasWorkers.add(0);
 	}
 	
 	public static WorkerCoordinator getInstance(){
@@ -30,48 +29,59 @@ public class WorkerCoordinator extends BaseClass {
 		return _instance;
 	}
 	
-	public void registerWorker(Unit worker){
-		if(isWorkerContained(worker)){
-			return;
+	public boolean areMinerWorkersRequired(int commandCenterIndex){
+		return _currentNrOfMinerWorkers.get(commandCenterIndex) <  Requirements.MAX_NR_MINING_WORKERS_ON_BASE;
+	}
+	
+	public boolean areGasWorkersRequired(int commandCenterIndex){
+		return _currentNrOfGasWorkers.get(commandCenterIndex) <  Requirements.MAX_NR_GAS_WORKERS_ON_BASE;
+	}
+	
+	public void runWorkers(){
+		//filter all worker units
+		List<Unit> commandCenters = ListUtils.getMyCommandCenters();
+
+		//iterate through my units
+		if(commandCenters.size() > 0){
+			for (int i = 0; i < commandCenters.size(); i++) {
+				Unit closestMineral = ListUtils.getClosestUnit(_game.getMinerals(), commandCenters.get(i),
+						UnitType.Resource_Mineral_Field);
+				Unit closestGasExtractor = ListUtils.getClosestUnit(_game.getGeysers(), commandCenters.get(i),
+						UnitType.Resource_Vespene_Geyser);
+
+				TilePosition tile = commandCenters.get(i).getTilePosition();
+				List<Unit> workers = ListUtils.getNearestUnitsTo(tile,UnitType.Terran_SCV, 30.0);
+
+				for (Unit worker : workers) {
+					if(worker.isIdle()){
+						if(this.areMinerWorkersRequired(i)){
+							sendToGatherMinerals(worker, closestMineral,i);
+						}else if(this.areGasWorkersRequired(i)){
+							sendToGatherGas(worker, closestGasExtractor, i);
+						}
+					}
+				}
+			}
 		}
-		
-		workerList.add(worker);
+    }
+	
+	private void sendToGatherMinerals(Unit worker, Unit closestMineral, int commandCenterIndex){
+        //if a mineral patch was found, send the drone to gather it
+        if (closestMineral != null) {
+        	worker.gather(closestMineral, false);
+        	_currentNrOfMinerWorkers.set(commandCenterIndex, _currentNrOfMinerWorkers.get(commandCenterIndex) + 1);
+        }
 	}
 	
-	public boolean isWorkerContained(Unit worker) {
-		return workerList.contains(worker);
-	}
-	
-	public void manageWorkers(){
-	}
-	
-	public void manageWorker(Unit worker){
-		if(worker.isIdle()){
-			
-		}
+	private void sendToGatherGas(Unit worker, Unit closestGasExtractor, int commandCenterIndex){
+    	//if a gas patch was found, send the drone to gather it
+        if (closestGasExtractor != null) {
+        	worker.gather(closestGasExtractor, false);
+        	_currentNrOfGasWorkers.set(commandCenterIndex, _currentNrOfGasWorkers.get(commandCenterIndex) + 1);
+        }
 	}
 
-	public ArrayList<ArrayList<Unit>> get_baseMiners() {
-		return _baseMiners;
-	}
-
-	public void set_baseMiners(ArrayList<ArrayList<Unit>> _baseMiners) {
-		this._baseMiners = _baseMiners;
-	}
-
-	public ArrayList<ArrayList<Unit>> get_baseExtractors() {
-		return _baseExtractors;
-	}
-
-	public void set_baseExtractors(ArrayList<ArrayList<Unit>> _baseExtractors) {
-		this._baseExtractors = _baseExtractors;
-	}
-
-	public ArrayList<ArrayList<Unit>> get_baseBuilders() {
-		return _baseBuilders;
-	}
-
-	public void set_baseBuilders(ArrayList<ArrayList<Unit>> _baseBuilders) {
-		this._baseBuilders = _baseBuilders;
+	public boolean areScoutsRequired() {
+		return false;
 	}
 }

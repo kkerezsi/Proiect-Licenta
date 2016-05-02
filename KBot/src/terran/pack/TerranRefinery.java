@@ -4,34 +4,44 @@ import java.util.List;
 
 import base.BaseClass;
 import builder.pack.BuildOrder;
-import builder.pack.BuilderSupplyCoordinator;
 import bwapi.Unit;
 import bwapi.UnitType;
 import constants.pack.Requirements;
 import contracts.pack.IBuilding;
 import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
-import resource.pack.CompleteResourceModel;
-import resource.pack.ResourceCoordinator;
 
-public class TerranCommandCenter extends BaseClass implements IBuilding {
-	private UnitType _buildingType = UnitType.Terran_Command_Center;
+public class TerranRefinery extends BaseClass implements IBuilding {
+	private UnitType _buildingType = UnitType.Terran_Refinery;
 	
-	private static TerranCommandCenter _instance;
+	private static TerranRefinery _instance;
 	
-	public static TerranCommandCenter getInstance(){
+	public static TerranRefinery getInstance(){
 		if(_instance == null){
-			_instance = new TerranCommandCenter();
+			_instance = new TerranRefinery();
 		}
 		
 		return _instance;
 	}
 	
-	private TerranCommandCenter(){
+	private TerranRefinery(){
 	}
 	
 	@Override
 	public boolean shouldBuild() {
+		List<Unit> refineries = ListUtils.getAllUnitsByType(_buildingType, _self);
+		int battleUnits = ListUtils.getNumberOfBattleUnitsCompleted();
+		
+		if (refineries != null) {
+			int nrOfCommandCenters = TerranCommandCenter.getInstance().getNumberOfThisType();
+			int nrOfRefineries = this.getNumberOfThisType();
+			boolean isEnoughInfantry =  true; //battleUnits != 0 && (battleUnits >= Requirements.MINIMUM_MARINES);
+			boolean isAnotherBaseAndFreeMinerals = nrOfCommandCenters >= 0 &&
+					nrOfRefineries < nrOfCommandCenters  ;
+			
+			return isEnoughInfantry || isAnotherBaseAndFreeMinerals;
+		}
+		
 		return false;
 	}
 

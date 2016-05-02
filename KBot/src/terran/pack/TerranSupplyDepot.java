@@ -9,9 +9,8 @@ import bwapi.Unit;
 import bwapi.UnitType;
 import constants.pack.Requirements;
 import contracts.pack.IBuilding;
+import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
-import resource.pack.CompleteResourceModel;
-import resource.pack.ResourceCoordinator;
 
 public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Supply_Depot;
@@ -31,7 +30,10 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	
 	@Override
 	public boolean shouldBuild() {
-		if(BuilderSupplyCoordinator.getInstance().getUsableSupply() < Requirements.ALERT_SUPPLY_ZONE)
+		int usableSupply = BuilderSupplyCoordinator.getInstance().getUsableSupply();
+		int usedSupply = BuilderSupplyCoordinator.getInstance().getSupplyUsed();
+
+		if( usedSupply >= usableSupply - Requirements.ALERT_SUPPLY_ZONE)
 			return true;
 		
 		return false;
@@ -39,19 +41,12 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 
 	@Override
 	public boolean canBuild() {
-		ResourceCoordinator reCoord = ResourceCoordinator.getInstance();
-		
-		CompleteResourceModel mineralsAndGasRequired = reCoord.getRequirementsForType(_buildingType);
-		CompleteResourceModel myResources = reCoord.getMyResources();
-		
-		if(mineralsAndGasRequired != null 
-				&& mineralsAndGasRequired.getMinerals() < myResources.getMinerals()
-				&& mineralsAndGasRequired.getGas() < myResources.getGas()){
-			
+		if (BuildUtils.canGenericBuild(_buildingType)){
 			BuildOrder.getInstance().cacheBuild(_buildingType);
+
 			return true;
 		}
-		
+
 		return false;
 	}
 

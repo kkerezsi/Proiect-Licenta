@@ -5,7 +5,7 @@ public class CompleteResourceModel {
 	private int _gas;
 	private int _minerals;
 
-	public CompleteResourceModel(int gas, int minerals){
+	public CompleteResourceModel(int minerals, int gas){
 		setGas(gas);
 		setMinerals(minerals);
 	}

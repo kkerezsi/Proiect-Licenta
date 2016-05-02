@@ -4,6 +4,8 @@ import java.util.Stack;
 
 import base.Tuple;
 import bwapi.UnitType;
+import listUtils.pack.BuildUtils;
+import resource.pack.ResourceCoordinator;
 
 public class BuildOrder {
 
@@ -27,46 +29,33 @@ public class BuildOrder {
 		return _buildOrders;
 	}
 	
-	public Building getNextItemToBuild(){
-		for (Building building : _buildOrders) {
-			if(building.get_isBuilt() == false){
-				return building;
-			}
-		}
-		
-		return null;
+	public Building peekNextBuilding(){
+        if(_buildOrders.size() == 0)
+            return null;
+
+		return _buildOrders.peek();
 	}
-	
-	public Building getNextItemToBuild(Tuple<Long,Long> time){
-		for (Building building : _buildOrders) {
-			if(building.get_isBuilt() == false && time.x >= building.get_minutes() && time.y >= building.get_seconds()){
-				return building;
-			}
-		}
-		
-		return null;
+
+	public boolean canNextBuildingBeBuilt(){
+        if(_buildOrders.size() == 0)
+            return false;
+
+		return BuildUtils.canGenericBuild(peekNextBuilding().get_unitType());
 	}
-	
+
+	public Building getNextBuilding(){
+        if(_buildOrders.size() == 0)
+            return null;
+
+		return _buildOrders.pop();
+	}
+
 	public void cacheBuild(UnitType unitType){
 		_buildOrders.add(new Building(unitType, false, 0, 0));
 	}
 	
-	public Building previewNextBuild(){
-		if(!_buildOrders.isEmpty())
-			return _buildOrders.peek();
-		
-		return null;
-	}
-	
-	public Building getNextBuild(){
-		if(!_buildOrders.isEmpty())
-			return _buildOrders.pop();
-		
-		return null;
-	}
-	
 	private void initialize(){
 		//read from file
-		_buildOrders = new Stack<Building>();
+		_buildOrders = new Stack<>();
 	}
 }
