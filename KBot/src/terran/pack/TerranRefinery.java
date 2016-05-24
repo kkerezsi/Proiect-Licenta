@@ -29,19 +29,34 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 	
 	@Override
 	public boolean shouldBuild() {
+		if(isBuilding()){
+			return false;
+		}
+
 		List<Unit> refineries = ListUtils.getAllUnitsByType(_buildingType, _self);
 		int battleUnits = ListUtils.getNumberOfBattleUnitsCompleted();
 		
 		if (refineries != null) {
 			int nrOfCommandCenters = TerranCommandCenter.getInstance().getNumberOfThisType();
 			int nrOfRefineries = this.getNumberOfThisType();
-			boolean isEnoughInfantry =  true; //battleUnits != 0 && (battleUnits >= Requirements.MINIMUM_MARINES);
+			boolean isEnoughInfantry =  false; //battleUnits != 0 && (battleUnits >= Requirements.MINIMUM_MARINES);
 			boolean isAnotherBaseAndFreeMinerals = nrOfCommandCenters >= 0 &&
 					nrOfRefineries < nrOfCommandCenters  ;
 			
 			return isEnoughInfantry || isAnotherBaseAndFreeMinerals;
 		}
 		
+		return false;
+	}
+
+	public boolean isBuilding(){
+		List<Unit> unitsOfThisType = this.getBuildingsOfThisType();
+
+		for(Unit u : unitsOfThisType){
+			if(!u.isCompleted())
+				return true;
+		}
+
 		return false;
 	}
 
@@ -69,6 +84,11 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 			return myBuildings.size();
 		
 		return 0;
+	}
+
+	@Override
+	public List<Unit> getBuildingsOfThisTypeNotCompleted() {
+		return ListUtils.getAllUnitsNotCompleted(_buildingType);
 	}
 
 	@Override

@@ -15,4 +15,6 @@ public interface IBuilding {
 	int getNumberOfThisType();
 	
 	List<Unit> getBuildingsOfThisType();
+
+	List<Unit> getBuildingsOfThisTypeNotCompleted();
 }

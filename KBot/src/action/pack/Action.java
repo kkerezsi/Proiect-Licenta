@@ -10,6 +10,7 @@ public abstract class Action {
     protected Unit unit;
     protected Action nextAction;
     private boolean actionExecuted;
+    protected int signature;
 
     public Action(Unit unit, Action nextAction){
         this.unit = unit;
@@ -32,12 +33,26 @@ public abstract class Action {
     }
 
     public boolean isPreconditionPassed(){
-        if(hasNextAction() && !nextAction.isActionExecuted()){
-            executeActions();
-            if(!nextAction.isActionExecuted())
-                return false;
+        if(hasNextAction() && nextAction.isActionExecuted())
+            return true;
+        else if(hasNextAction() && !nextAction.isActionExecuted()){
+            nextAction.executeActions();
+
+            return false;
         }
 
         return  true;
+    }
+
+    public Unit getActionUnit(){
+        return  this.unit;
+    }
+
+    public Action getNextAction(){
+        return this.nextAction;
+    }
+
+    public int getSignature(){
+        return this.signature;
     }
 }

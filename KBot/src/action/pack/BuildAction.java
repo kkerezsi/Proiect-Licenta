@@ -4,6 +4,8 @@ import builder.pack.BuildLogicsCoordinator;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import constants.pack.Requirements;
+import constants.pack.Signatures;
 
 /**
  * Created by Alex on 5/1/2016.
@@ -18,6 +20,7 @@ public class BuildAction extends Action{
 
         this.buildingTypeNeeded = buildingTypeNeeded;
         this.position = position;
+        this.signature = Signatures.BUILD_ACTION_SIG;
     }
 
     @Override
@@ -34,9 +37,15 @@ public class BuildAction extends Action{
             return true;
 
         if(!BuildLogicsCoordinator.getInstance().canBuildAt(position,buildingTypeNeeded)){
-            return  false;
+            this.position = BuildLogicsCoordinator.getInstance().getLegitTileToBuildNear(buildingTypeNeeded, position, 6, Requirements.MAX_SEARCH_RANGE);
+
+            return false;
         }
 
         return  true;
+    }
+
+    public UnitType getUnitType(){
+        return this.buildingTypeNeeded;
     }
 }

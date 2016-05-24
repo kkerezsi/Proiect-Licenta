@@ -3,30 +3,43 @@ import bwapi.UnitType;
 
 public class Building {
 	
-	private UnitType _unitType;
-	private boolean _isBuilt;
+	private UnitType unitType;
+	private boolean isBuilt;
+	private boolean isBuilding;
 
 	public Building(UnitType unitType,boolean isBuilt){
-		this._unitType = unitType;
-		this._isBuilt = isBuilt;
+		this.unitType = unitType;
+		this.isBuilt = isBuilt;
+		isBuilding = false;
 	}
 	
-	public UnitType get_unitType() {
-		return _unitType;
+	public UnitType getUnitType() {
+		return unitType;
 	}
-	public void set_unitType(UnitType _unitType) {
-		this._unitType = _unitType;
+
+	public void setUnitType(UnitType unitType) {
+		this.unitType = unitType;
 	}
-	public boolean get_isBuilt() {
-		return _isBuilt;
+
+	public boolean getBuilt() {
+		return isBuilt;
 	}
-	public void set_isBuilt(boolean _isBuilt) {
-		this._isBuilt = _isBuilt;
+
+	public void setBuilt(boolean built) {
+		this.isBuilt = built;
 	}
 
 	public boolean isSpecialBuilding() {
-		return get_unitType() == UnitType.Terran_Refinery
-				|| get_unitType() == UnitType.Terran_Bunker
-				|| get_unitType() == UnitType.Terran_Command_Center;
+		return getUnitType() == UnitType.Terran_Refinery
+				|| getUnitType() == UnitType.Terran_Bunker
+				|| getUnitType() == UnitType.Terran_Command_Center;
+	}
+
+	public boolean isBuilding() {
+		return isBuilding;
+	}
+
+	public void setBuilding(boolean building) {
+		isBuilding = building;
 	}
 }

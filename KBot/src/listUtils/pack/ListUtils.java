@@ -62,6 +62,16 @@ public class ListUtils {
 		
 		return filteredUnits;
 	}
+
+	public static List<Unit> getQueuedUnits(UnitType unitType){
+		List<Unit> filteredUnits = new ArrayList<>();
+		for (Unit u : _self.getUnits()) {
+			if(u.getType() == unitType && !u.isCompleted())
+				filteredUnits.add(u);
+		}
+
+		return filteredUnits;
+	}
 	
 	public static List<Unit> getAllIdleUnitsByType(UnitType type,List<Unit> units){
 		List<Unit> filteredUnits = new ArrayList<>();
@@ -100,8 +110,8 @@ public class ListUtils {
 		return null;
 	}
 	
-	public static List<Unit> removeDeadUnits(List<Unit> units){
-		List<Unit> filteredUnits = new ArrayList<>();
+	public static ArrayList<Unit> removeDeadUnits(List<Unit> units){
+		ArrayList<Unit> filteredUnits = new ArrayList<>();
 		for (Unit u : units) {
 			if(u.exists())
 				filteredUnits.add(u);
@@ -303,7 +313,7 @@ public class ListUtils {
         return objectsOfThisType;
     }
 
-	public static List<Unit> getMyCommandCenters(){
+	public static ArrayList<Unit> getMyCommandCenters(){
 		ArrayList<Unit> commandCenters = new ArrayList<>();
 
 		for (Unit u :
@@ -320,7 +330,7 @@ public class ListUtils {
 		if(commandCenters.size() == 0)
 			return null;
 
-		int randomCenterIndex = RandomProvider.randInt(0, commandCenters.size());
+		int randomCenterIndex = RandomProvider.randInt(0, commandCenters.size() - 1);
 
 		return commandCenters.get(randomCenterIndex);
 	}
@@ -332,11 +342,26 @@ public class ListUtils {
 		for (Unit unit :
 				_self.getUnits()) {
 			if(unit.getType() == unitType &&
-					getDistanceBetween(tile.getX(),tile.getY(), unit.getX(), unit.getY()) <= searchRange){
+					getDistanceBetween(tile.getX(),tile.getY(), unit.getX(), unit.getY()) <= searchRange &&
+					unit.isCompleted()
+					){
 				nearestUnits.add(unit);
 			}
 		}
 
 		return  nearestUnits;
+	}
+
+	public static List<Unit> getAllUnitsNotCompleted(UnitType buildingType) {
+		List<Unit> units = _self.getUnits();
+		ArrayList<Unit> notComplUnits = new ArrayList<>();
+		for (Unit u :
+				units) {
+			if(!u.isCompleted() || u.isBeingConstructed()){
+				notComplUnits.add(u);
+			}
+		}
+
+		return notComplUnits;
 	}
 }

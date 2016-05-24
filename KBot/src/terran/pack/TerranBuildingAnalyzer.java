@@ -1,6 +1,8 @@
 package terran.pack;
 
 import base.BaseClass;
+import builder.pack.BuildOrder;
+import builder.pack.Building;
 
 /**
  * Created by Alex on 4/30/2016.
@@ -21,21 +23,22 @@ public class TerranBuildingAnalyzer extends BaseClass {
     }
 
     public void runAnalyzer(){
+        if(BuildOrder.getInstance().peekNextBuilding() == null) {
+            if (TerranSupplyDepot.getInstance().shouldBuild()) {
+                TerranSupplyDepot.getInstance().canBuild();
+            }
 
-        if(TerranSupplyDepot.getInstance().shouldBuild()) {
-            TerranSupplyDepot.getInstance().canBuild();
-        }
+            else if (TerranBarracks.getInstance().shouldBuild()) {
+                TerranBarracks.getInstance().canBuild();
+            }
 
-        if(TerranRefinery.getInstance().shouldBuild()){
-            TerranRefinery.getInstance().canBuild();
-        }
+            else if (TerranRefinery.getInstance().shouldBuild()) {
+                TerranRefinery.getInstance().canBuild();
+            }
 
-        if(TerranCommandCenter.getInstance().shouldBuild()){
-            TerranCommandCenter.getInstance().canBuild();
-        }
-
-        if(TerranBarracks.getInstance().shouldBuild()){
-            TerranBarracks.getInstance().canBuild();
+            else if (TerranCommandCenter.getInstance().shouldBuild()) {
+                TerranCommandCenter.getInstance().canBuild();
+            }
         }
     }
 }

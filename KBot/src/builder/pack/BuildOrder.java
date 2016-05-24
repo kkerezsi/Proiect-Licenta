@@ -1,11 +1,8 @@
 package builder.pack;
-import java.util.ArrayList;
 import java.util.Stack;
 
-import base.Tuple;
 import bwapi.UnitType;
 import listUtils.pack.BuildUtils;
-import resource.pack.ResourceCoordinator;
 
 public class BuildOrder {
 
@@ -40,7 +37,7 @@ public class BuildOrder {
         if(_buildOrders.size() == 0)
             return false;
 
-		return BuildUtils.canGenericBuild(peekNextBuilding().get_unitType());
+		return BuildUtils.canGenericBuild(peekNextBuilding().getUnitType());
 	}
 
 	public Building getNextBuilding(){
@@ -51,7 +48,7 @@ public class BuildOrder {
 	}
 
 	public void cacheBuild(UnitType unitType){
-		_buildOrders.add(new Building(unitType, false, 0, 0));
+		_buildOrders.add(new Building(unitType, false));
 	}
 	
 	private void initialize(){

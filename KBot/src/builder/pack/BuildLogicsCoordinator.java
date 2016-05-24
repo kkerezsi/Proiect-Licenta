@@ -4,6 +4,7 @@ import base.BaseClass;
 import bwapi.*;
 import constants.pack.Requirements;
 import listUtils.pack.ListUtils;
+import listUtils.pack.Painter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +114,9 @@ public class BuildLogicsCoordinator extends BaseClass {
         int x = tileX * 32;
         int y = tileY * 32;
 
-        TilePosition place = new TilePosition(x, y);
+        Painter.getInstance().addTile(x,y);
+
+        TilePosition place = new TilePosition(tileX, tileY);
 
         // Is it physically possible to build here?
         if (canBuildAt(place, type)) {
@@ -226,7 +229,7 @@ public class BuildLogicsCoordinator extends BaseClass {
         }
 
         // builder.getID(),
-        return _game.canBuildHere(point, type);
+        return _game.canBuildHere(point.getPoint(), type);
     }
 
     public boolean isBuildTileFreeFromUnits(UnitType type, int builderID, int tileX,

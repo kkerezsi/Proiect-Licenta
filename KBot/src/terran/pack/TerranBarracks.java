@@ -2,11 +2,15 @@ package terran.pack;
 
 import java.util.List;
 
+import action.pack.Action;
+import action.pack.ActionQueue;
+import action.pack.BuildAction;
 import base.BaseClass;
 import builder.pack.BuildOrder;
 import bwapi.Unit;
 import bwapi.UnitType;
 import constants.pack.Requirements;
+import constants.pack.Signatures;
 import contracts.pack.IBuilding;
 import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
@@ -30,6 +34,14 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 	@Override
 	public boolean shouldBuild() {
         int nrOfBarracks = getNumberOfThisType();
+
+		if(isBuilding()){
+			return  false;
+		}
+
+		if(isAlreadyQueued()){
+			return false;
+		}
 
 		if(TerranSupplyDepot.getInstance().getNumberOfThisType() < Requirements.MINIMUM_SUPPLY_DEPOTS_FOR_BARRACKS)
 			return false;
@@ -69,12 +81,40 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 		return 0;
 	}
 
+	public boolean isAlreadyQueued(){
+		List<Action> buildActions = ActionQueue.getInstance().getActionsWithSignature(Signatures.BUILD_ACTION_SIG);
+		for (Action a :
+				buildActions) {
+			if(((BuildAction)a).getUnitType() == UnitType.Terran_Barracks){
+				return true;
+			}
+		}
+
+		return  false;
+	}
+
+	public boolean isBuilding(){
+		List<Unit> unitsOfThisType = this.getBuildingsOfThisType();
+
+		for(Unit u : unitsOfThisType){
+			if(!u.isCompleted())
+				return true;
+		}
+
+		return false;
+	}
+
 	@Override
 	public List<Unit> getBuildingsOfThisType() {
 		return ListUtils.getAllUnitsByType(_buildingType, _self);
 	}
 
-    private int determineFibonacciReport(int nrOfCommandCenters){
+	@Override
+	public List<Unit> getBuildingsOfThisTypeNotCompleted() {
+		return ListUtils.getAllUnitsNotCompleted(_buildingType);
+	}
+
+	private int determineFibonacciReport(int nrOfCommandCenters){
         switch (nrOfCommandCenters){
             case 1: return 2;
             case 2: return 3;

@@ -3,8 +3,13 @@ import base.BaseClass;
 import base.TimeManager;
 import base.Tuple;
 import bwapi.*;
+import bwapi.CoordinateType.Enum;
 import bwta.BWTA;
 import bwta.BaseLocation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Painter extends BaseClass {
 
@@ -13,7 +18,10 @@ public class Painter extends BaseClass {
 	private final int timeConsumptionBarMaxWidth = 50;
 	private final int timeConsumptionBarHeight = 14;
 	private final int timeConsumptionYInterval = 16;
-	
+
+
+	private List<Position> tileDraws = new ArrayList<>();
+
 	private static Painter _instance;
 	
 	private Painter(){
@@ -71,5 +79,21 @@ public class Painter extends BaseClass {
 		paintTimeConsumption();
 		paintBaseLocations();
 		paintGameTime();
+		drawTile();
 	}
+
+	public void addTile(int x, int y){
+		tileDraws.add(new Position(x,y));
+	}
+
+	public void drawTile() {
+		for(Position p: tileDraws)
+			_game.drawBox(Enum.Map, p.getX() ,p.getY(),p.getX() + 32, p.getY() + 32,Color.Green);
+	}
+
+	public void clearTiles(){
+		tileDraws.clear();
+	}
+
+
 }

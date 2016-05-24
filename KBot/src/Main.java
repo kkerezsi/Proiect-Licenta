@@ -1,3 +1,4 @@
+import action.pack.ActionQueue;
 import bwapi.*;
 import bwta.BWTA;
 import listUtils.pack.CodeProfiler;
@@ -41,9 +42,10 @@ public class Main extends DefaultBWListener {
 
         // Register components
         WorkerCoordinator.getInstance().init(game, self);
+        ActionQueue.getInstance().init(game,self);
         Painter.getInstance().init(game,self);
         BuilderCoordinator.getInstance().init(game,self);
-        BuilderSupplyCoordinator.getInstance().init(game, self);
+        SupplyCoordinator.getInstance().init(game, self);
         BuildLogicsCoordinator.getInstance().init(game,self);
         ResourceCoordinator.getInstance().init(game, self);
 
@@ -65,7 +67,7 @@ public class Main extends DefaultBWListener {
             frameCounter = game.getFrameCount();
             secondCounter = frameCounter / 30;
 
-            if(getFrames() % 8 == 0){
+            if(getFrames() % 13 == 0){
                 CodeProfiler.startMeasuring("Builder");
                 BuilderCoordinator.getInstance().runCoordinator();
                 CodeProfiler.endMeasuring("Builder");
@@ -73,7 +75,7 @@ public class Main extends DefaultBWListener {
 
             if(getFrames() % 9 == 0) {
                 CodeProfiler.startMeasuring("Supply");
-                BuilderSupplyCoordinator.getInstance().runCoordinator();
+                SupplyCoordinator.getInstance().runCoordinator();
                 CodeProfiler.endMeasuring("Supply");
             }
 
@@ -89,11 +91,18 @@ public class Main extends DefaultBWListener {
                 CodeProfiler.endMeasuring("BuildingAnalyzer");
             }
 
+            if(getFrames() % 8 == 0){
+                CodeProfiler.startMeasuring("ActionQueue");
+                ActionQueue.getInstance().executeActions();
+                CodeProfiler.endMeasuring("ActionQueue");
+            }
+
             Painter.getInstance().paintAll();
         }
         catch (Exception ex){
             System.out.println("---------------------");
-            System.out.println(" Error occurred with message: " + ex.getMessage());
+            System.out.println(" Error occurred with message: " +  ex.getMessage() + "\n <___________> \n" + ex.getLocalizedMessage());
+            ex.printStackTrace(System.out);
         }
     }
 

@@ -1,4 +1,4 @@
-package builder.pack;
+package unit.pack;
 
 import bwapi.Game;
 import bwapi.Player;

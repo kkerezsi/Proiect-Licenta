@@ -4,15 +4,11 @@ import java.util.List;
 
 import base.BaseClass;
 import builder.pack.BuildOrder;
-import builder.pack.BuilderSupplyCoordinator;
 import bwapi.Unit;
 import bwapi.UnitType;
-import constants.pack.Requirements;
 import contracts.pack.IBuilding;
 import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
-import resource.pack.CompleteResourceModel;
-import resource.pack.ResourceCoordinator;
 
 public class TerranCommandCenter extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Command_Center;
@@ -33,6 +29,11 @@ public class TerranCommandCenter extends BaseClass implements IBuilding {
 	@Override
 	public boolean shouldBuild() {
 		return false;
+	}
+
+	@Override
+	public List<Unit> getBuildingsOfThisTypeNotCompleted() {
+		return ListUtils.getAllUnitsNotCompleted(_buildingType);
 	}
 
 	@Override
