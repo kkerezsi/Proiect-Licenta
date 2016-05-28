@@ -1,4 +1,5 @@
 import action.pack.ActionQueue;
+import attack.pack.AttackCoordinator;
 import bwapi.*;
 import bwta.BWTA;
 import listUtils.pack.CodeProfiler;
@@ -41,18 +42,22 @@ public class Main extends DefaultBWListener {
         ListUtils._self = self;
 
         // Register components
-        WorkerCoordinator.getInstance().init(game, self);
-        ActionQueue.getInstance().init(game,self);
         Painter.getInstance().init(game,self);
+
+        WorkerCoordinator.getInstance().init(game, self);
         BuilderCoordinator.getInstance().init(game,self);
-        SupplyCoordinator.getInstance().init(game, self);
         BuildLogicsCoordinator.getInstance().init(game,self);
+        ActionQueue.getInstance().init(game,self);
+        SupplyCoordinator.getInstance().init(game, self);
         ResourceCoordinator.getInstance().init(game, self);
+        ScoutCoordinator.getInstance().init(game,self);
 
         TerranRefinery.getInstance().init(game,self);
         TerranSupplyDepot.getInstance().init(game,self);
         TerranBarracks.getInstance().init(game,self);
         TerranCommandCenter.getInstance().init(game,self);
+
+        AttackCoordinator.getInstance().init(game,self);
         //End register
 
         System.out.println("Analyzing map...");
@@ -95,6 +100,18 @@ public class Main extends DefaultBWListener {
                 CodeProfiler.startMeasuring("ActionQueue");
                 ActionQueue.getInstance().executeActions();
                 CodeProfiler.endMeasuring("ActionQueue");
+            }
+
+            if(getFrames() % 15 == 0){
+                CodeProfiler.startMeasuring("ActionCoordinator");
+                AttackCoordinator.getInstance().runCoordinator();
+                CodeProfiler.endMeasuring("ActionCoordinator");
+            }
+
+            if(getFrames() % 17 == 0){
+                CodeProfiler.startMeasuring("ScoutCoordinator");
+                AttackCoordinator.getInstance().runCoordinator();
+                CodeProfiler.endMeasuring("ScoutCoordinator");
             }
 
             Painter.getInstance().paintAll();

@@ -1,9 +1,10 @@
 package attack.pack;
 
+import base.BaseClass;
 import bwapi.Game;
 import bwapi.Player;
 
-public class AttackCoordinator {
+public class AttackCoordinator extends BaseClass{
 	private static AttackCoordinator _instance;
 	
 	private AttackCoordinator(){
@@ -17,7 +18,6 @@ public class AttackCoordinator {
 		return _instance;
 	}
 	
-	public void runCoordinator(Game game,Player self){
-	
+	public void runCoordinator(){
 	}
 }

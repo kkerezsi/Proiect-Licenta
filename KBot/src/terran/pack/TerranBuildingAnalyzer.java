@@ -3,6 +3,10 @@ package terran.pack;
 import base.BaseClass;
 import builder.pack.BuildOrder;
 import builder.pack.Building;
+import bwapi.Unit;
+import listUtils.pack.ListUtils;
+
+import java.util.ArrayList;
 
 /**
  * Created by Alex on 4/30/2016.
@@ -23,6 +27,7 @@ public class TerranBuildingAnalyzer extends BaseClass {
     }
 
     public void runAnalyzer(){
+
         if(BuildOrder.getInstance().peekNextBuilding() == null) {
             if (TerranSupplyDepot.getInstance().shouldBuild()) {
                 TerranSupplyDepot.getInstance().canBuild();

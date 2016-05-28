@@ -1,9 +1,10 @@
 package unit.pack;
 
+import base.BaseClass;
 import bwapi.Game;
 import bwapi.Player;
 
-public class ScoutCoordinator {
+public class ScoutCoordinator extends BaseClass {
 	private static ScoutCoordinator _instance;
 	
 	private ScoutCoordinator(){
@@ -17,7 +18,6 @@ public class ScoutCoordinator {
 		return _instance;
 	}
 	
-	public void runCoordinator(Game game,Player self){
-		
+	public void runCoordinator(){
 	}
 }

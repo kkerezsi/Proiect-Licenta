@@ -9,6 +9,7 @@ public class BuildOrder {
 	private static Stack<Building> _buildOrders;
 	
 	private static BuildOrder _instance;
+	private static boolean lockBuildAction = false;
 	
 	public static BuildOrder getInstance(){
 		if(_instance == null){
@@ -44,15 +45,30 @@ public class BuildOrder {
         if(_buildOrders.size() == 0)
             return null;
 
+		lockBuildAction = false;
 		return _buildOrders.pop();
 	}
 
 	public void cacheBuild(UnitType unitType){
-		_buildOrders.add(new Building(unitType, false));
+		if(!isActionLocked()) {
+			lockBuildAction = true;
+			_buildOrders.add(new Building(unitType, false));
+		}
 	}
 	
 	private void initialize(){
 		//read from file
 		_buildOrders = new Stack<>();
+	}
+
+	public boolean isActionLocked(){
+		return lockBuildAction;
+	}
+
+	public boolean isCached(UnitType unitType) {
+		if(this._buildOrders.size() == 0)
+			return false;
+
+		return this._buildOrders.get(0).getUnitType() == unitType;
 	}
 }

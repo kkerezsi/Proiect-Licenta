@@ -16,7 +16,7 @@ import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
 
 public class TerranBarracks extends BaseClass implements IBuilding {
-	private UnitType _buildingType = UnitType.Terran_Supply_Depot;
+	private UnitType _buildingType = UnitType.Terran_Barracks;
 	
 	private static TerranBarracks _instance;
 	
@@ -35,10 +35,6 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 	public boolean shouldBuild() {
         int nrOfBarracks = getNumberOfThisType();
 
-		if(isBuilding()){
-			return  false;
-		}
-
 		if(isAlreadyQueued()){
 			return false;
 		}
@@ -46,11 +42,12 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 		if(TerranSupplyDepot.getInstance().getNumberOfThisType() < Requirements.MINIMUM_SUPPLY_DEPOTS_FOR_BARRACKS)
 			return false;
 
-        if(nrOfBarracks >= Requirements.MAX_NR_OF_BARRACKS)
-            return false;
-
         if(nrOfBarracks >= determineFibonacciReport(TerranCommandCenter.getInstance().getNumberOfThisType()))
             return false;
+
+		if(getBuildingsOfThisTypeNotCompleted().size() > 0){
+			return false;
+		}
 
 		return true;
 	}

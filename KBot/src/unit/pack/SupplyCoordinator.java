@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import base.BaseClass;
+import bwapi.Position;
 import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -67,11 +68,12 @@ public class SupplyCoordinator extends BaseClass {
 
 	public void populateBuilders(List<Unit> supplyBuilders, int baseIndex) {
 		Unit builder = ListUtils.getNearestWorkerTo(supplyBuilders.get(baseIndex).getTilePosition());
+		WorkerCoordinator workerCInstance =  WorkerCoordinator.getInstance();
 
-		WorkerCoordinator.getInstance().removeFromMinersOrExtractors(builder, baseIndex);
+		workerCInstance.removeFromMinersOrExtractors(builder, baseIndex);
 		if( builder != null ) {
-			builder.stop();
-			WorkerCoordinator.getInstance().getBuilders(baseIndex).add(builder);
+			builder.move(new Position(supplyBuilders.get(baseIndex).getPosition().getX() + 150 , supplyBuilders.get(baseIndex).getPosition().getY() + 150));
+			workerCInstance.getBuilders(baseIndex).add(builder);
 		}
 	}
 }

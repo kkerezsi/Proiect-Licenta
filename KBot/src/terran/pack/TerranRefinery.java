@@ -34,7 +34,7 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 		}
 
 		List<Unit> refineries = ListUtils.getAllUnitsByType(_buildingType, _self);
-		int battleUnits = ListUtils.getNumberOfBattleUnitsCompleted();
+		//int battleUnits = ListUtils.getNumberOfBattleUnitsCompleted();
 		
 		if (refineries != null) {
 			int nrOfCommandCenters = TerranCommandCenter.getInstance().getNumberOfThisType();

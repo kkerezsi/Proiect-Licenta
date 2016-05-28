@@ -14,20 +14,36 @@ public class BuildAction extends Action{
 
     private UnitType buildingTypeNeeded;
     private TilePosition position;
-
+    private Boolean isConstructionFinished;
+    private boolean actionStarted;
     public BuildAction(Unit unit, UnitType buildingTypeNeeded, TilePosition position , Action nextAction){
         super(unit,nextAction);
 
         this.buildingTypeNeeded = buildingTypeNeeded;
         this.position = position;
         this.signature = Signatures.BUILD_ACTION_SIG;
+
+        this.isConstructionFinished = null;
+        this.actionStarted = false;
     }
 
     @Override
     public void executeActions() {
-        if(isPreconditionPassed() && isConditionPassed()){
-            this.unit.build(buildingTypeNeeded,position);
-            this.setActionExecuted(true);
+        if(isConstructionFinished != null && isConstructionFinished == false) {
+            if(!unit.isConstructing()) {
+                isConstructionFinished = true;
+                this.setActionExecuted(true);
+            }
+        }
+        else {
+            if (isPreconditionPassed() && isConditionPassed()) {
+                if (!unit.isConstructing() && !actionStarted) {
+                    this.unit.build(buildingTypeNeeded, position);
+                    this.actionStarted = true;
+                }else {
+                    isConstructionFinished = false;
+                }
+            }
         }
     }
 
@@ -41,6 +57,9 @@ public class BuildAction extends Action{
 
             return false;
         }
+
+        if(unit.isConstructing())
+            return false;
 
         return  true;
     }

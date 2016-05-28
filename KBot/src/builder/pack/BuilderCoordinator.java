@@ -13,7 +13,6 @@ import unit.pack.WorkerCoordinator;
 
 public class BuilderCoordinator extends BaseClass {
 	private static BuilderCoordinator _instance;
-	private static int _supplyIndexValue = 3;
 
 	private BuilderCoordinator(){
 	}
@@ -37,20 +36,20 @@ public class BuilderCoordinator extends BaseClass {
 			Building building = nextBuilding;
 
 			if(scv != null) {
-				if (!building.isBuilding() && building.getBuilt())
-					BuildOrder.getInstance().getBuildingOrder();
-				else if (building != null && !building.isBuilding()) {
+				if (building != null && !building.isBuilding()) {
 					if (building.isSpecialBuilding()) {
 						TilePosition tile = BuildLogicsCoordinator.getInstance().determineSpecialBuildPosition(building.getUnitType());
 
 						if (tile != null) {
 							scv.build(building.getUnitType(), tile);
+							BuildOrder.getInstance().getNextBuilding();
 						}
 					} else {
 						Painter.getInstance().clearTiles();
 						TilePosition tile = BuildLogicsCoordinator.getInstance().determineBuildPosition(building.getUnitType());
 
 						if (tile != null) {
+							BuildOrder.getInstance().getNextBuilding();
 							ActionQueue.getInstance().enqueueAction(
 									new BuildAction(scv, building.getUnitType(), tile, null));
 						}

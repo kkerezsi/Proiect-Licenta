@@ -1,6 +1,9 @@
 package constants.pack;
 
 public class Requirements {
+	public static final double SEARCH_RANGE_WORKERS = 450.0;
+	public static final int MAX_NR_MINING_WORKERS_WITHOUT_BUILDER = 7;
+
 	public static int MAX_NR_MINING_WORKERS_ON_BASE = 10;
 	public static int MAX_NR_GAS_WORKERS_ON_BASE = 3;
 	public static int MAX_NR_SCOUTS = 1;

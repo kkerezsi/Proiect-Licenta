@@ -15,11 +15,15 @@ public class WorkerCoordinator extends BaseClass {
 	private Map<Integer, ArrayList<Unit>> minerWorkers = new HashMap<Integer, ArrayList<Unit> >();
 	private Map<Integer, ArrayList<Unit>> gasWorkers = new HashMap<Integer, ArrayList<Unit> >();
 	private Map<Integer, ArrayList<Unit>> builderWorkers = new HashMap<Integer, ArrayList<Unit> >();
+
+	private int currentSize;
 	
 	private WorkerCoordinator(){
 		minerWorkers.put(0, new ArrayList<Unit>());
 		gasWorkers.put(0, new ArrayList<Unit>());
 		builderWorkers.put(0, new ArrayList<Unit>());
+
+		currentSize = 0;
 	}
 	
 	public static WorkerCoordinator getInstance(){
@@ -31,7 +35,9 @@ public class WorkerCoordinator extends BaseClass {
 	}
 	
 	public boolean areMinerWorkersRequired(int commandCenterIndex){
-		return minerWorkers.get(commandCenterIndex).size() <  Requirements.MAX_NR_MINING_WORKERS_ON_BASE;
+        int mineralWorkersCount = minerWorkers.get(commandCenterIndex).size();
+
+        return (mineralWorkersCount <  Requirements.MAX_NR_MINING_WORKERS_ON_BASE);
 	}
 	
 	public boolean areGasWorkersRequired(int commandCenterIndex){
@@ -39,42 +45,50 @@ public class WorkerCoordinator extends BaseClass {
 	}
 
 	public boolean areBuildersRequired(int commandCenterIndex) {
-		return builderWorkers.get(commandCenterIndex).size() < Requirements.MAX_NR_BASE_BUILDERS;
+        int mineralWorkersCount = minerWorkers.get(commandCenterIndex).size();
+        int builderWorkersCount = builderWorkers.get(commandCenterIndex).size();
+
+		return (builderWorkersCount < Requirements.MAX_NR_BASE_BUILDERS)
+			|| (mineralWorkersCount % Requirements.MAX_NR_MINING_WORKERS_WITHOUT_BUILDER == 0);
 	}
 
 	public void runWorkers(){
 		//filter all worker units
-		ArrayList<Unit> commandCenters = ListUtils.getMyCommandCenters();
+		int stateUnitsCount = _self.getUnits().size();
 
+		if(stateUnitsCount != currentSize) {
+			currentSize = stateUnitsCount;
+			ArrayList<Unit> commandCenters = ListUtils.getMyCommandCenters();
 
-		//handle idle units
-		if(commandCenters.size() > 0){
-			for (int i = 0; i < commandCenters.size(); i++) {
-				updateWorkers(i, commandCenters);
+			//handle idle units
+			if(commandCenters.size() > 0) {
+				for (int i = 0; i < commandCenters.size(); i++) {
+					updateWorkers(i, commandCenters);
 
-				Unit closestMineral = null;
-				Unit closestGasExtractor = null;
+					Unit closestMineral = null;
+					Unit closestGasExtractor = null;
 
-				TilePosition tile = commandCenters.get(i).getTilePosition();
-				List<Unit> workers = ListUtils.getNearestUnitsTo(tile,UnitType.Terran_SCV, 450.0);
+					TilePosition tile = commandCenters.get(i).getTilePosition();
+					List<Unit> workers = ListUtils.getNearestUnitsTo(tile, UnitType.Terran_SCV, Requirements.SEARCH_RANGE_WORKERS);
 
-				for (Unit worker : workers) {
-					if(worker.isIdle() && worker.isCompleted()){
-						if(this.areMinerWorkersRequired(i)){
-							if(closestMineral == null){
-								closestMineral = ListUtils.getClosestUnit(_game.getMinerals(), commandCenters.get(i),
-										UnitType.Resource_Mineral_Field);
+					for (Unit worker : workers) {
+						if (!isWorkerInAnyCategory(i,worker)) {
+							if (this.areMinerWorkersRequired(i)) {
+								if (closestMineral == null) {
+									closestMineral = ListUtils.getClosestUnit(_game.getMinerals(), commandCenters.get(i),
+											UnitType.Resource_Mineral_Field);
+								}
+
+								sendToGatherMinerals(worker, closestMineral, i);
+							} else if (this.areGasWorkersRequired(i)) {
+								if (closestGasExtractor == null) {
+									closestGasExtractor = ListUtils.getClosestUnit(_self.getUnits(), commandCenters.get(i), UnitType.Terran_Refinery);
+								}
+
+								sendToGatherGas(worker, closestGasExtractor, i);
+							} else if (this.areScoutsRequired()) {
+								//send unit to scout
 							}
-
-							sendToGatherMinerals(worker, closestMineral,i);
-						}else if(this.areGasWorkersRequired(i)){
-							if(closestGasExtractor == null){
-								closestGasExtractor = ListUtils.getClosestUnit(_self.getUnits(),commandCenters.get(i), UnitType.Terran_Refinery);
-							}
-
-							sendToGatherGas(worker, closestGasExtractor, i);
-						} else if (this.areScoutsRequired()){
-							//send unit to scout
 						}
 					}
 				}
@@ -87,6 +101,9 @@ public class WorkerCoordinator extends BaseClass {
         if (closestMineral != null) {
         	worker.gather(closestMineral, false);
 			minerWorkers.get(commandCenterIndex).add(worker);
+        }else {
+            minerWorkers.get(commandCenterIndex).add(worker);
+            System.out.println("Can't do anything. I am waiting for gas minerals");
         }
 	}
 	
@@ -96,6 +113,11 @@ public class WorkerCoordinator extends BaseClass {
         	worker.gather(closestGasExtractor, false);
         	gasWorkers.get(commandCenterIndex).add(worker);
         }
+		else {
+			worker.stop();
+            gasWorkers.get(commandCenterIndex).add(worker);
+			System.out.println("Can't do anything. I am waiting for gas extractor");
+		}
 	}
 
 	public ArrayList<Unit> getBuilders(int commandCenterIndex){
@@ -124,6 +146,13 @@ public class WorkerCoordinator extends BaseClass {
 		ArrayList<Unit> workers = ListUtils.removeDeadUnits(builderWorkers.get(commandCenterIndex));
 		builderWorkers.get(commandCenterIndex).clear();
 		builderWorkers.get(commandCenterIndex).addAll(workers);
+
+        for (Unit w :
+                workers) {
+            w.move(new Position(commandCenters.get(commandCenterIndex).getPosition().getX() + 150 ,
+                                commandCenters.get(commandCenterIndex).getPosition().getY() + 150));
+        }
+
 	}
 
 	private void updateMiners(int commandCenterIndex, ArrayList<Unit> commandCenters){
@@ -166,4 +195,11 @@ public class WorkerCoordinator extends BaseClass {
 		minerWorkers.get(commandCenterIndex).remove(builder);
 		gasWorkers.get(commandCenterIndex).remove(builder);
 	}
+
+    private boolean isWorkerInAnyCategory(int baseIndex, Unit worker){
+        return (worker.isIdle()
+                && gasWorkers.get(baseIndex).contains(worker)
+                || minerWorkers.get(baseIndex).contains(worker)
+                || builderWorkers.get(baseIndex).contains(worker));
+    }
 }

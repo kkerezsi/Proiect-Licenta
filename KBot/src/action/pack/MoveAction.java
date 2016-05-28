@@ -23,6 +23,9 @@ public class MoveAction extends Action{
 
     @Override
     public void executeActions() {
+        if(isActionExecuted())
+            return;
+
         if(isPreconditionPassed() && isConditionPassed()){
             this.setActionExecuted(true);
         }
@@ -30,10 +33,14 @@ public class MoveAction extends Action{
 
     @Override
     public boolean isConditionPassed() {
-        if(isActionExecuted())
-            return true;
+        if(!unit.isMoving()) {
+            unit.move(position);
 
-        unit.move(position);
+            return false;
+        }
+
+        if(unit.getDistance(position) > 50)
+            return false;
 
         return true;
     }

@@ -20,7 +20,9 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Supply_Depot;
 	
 	private static TerranSupplyDepot _instance;
-	
+
+	private int supplyDepotCount;
+
 	public static TerranSupplyDepot getInstance(){
 		if(_instance == null){
 			_instance = new TerranSupplyDepot();
@@ -28,32 +30,37 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		
 		return _instance;
 	}
-	
+
 	private TerranSupplyDepot(){
+		supplyDepotCount = 0;
 	}
 	
 	@Override
 	public boolean shouldBuild() {
-		if(isAlreadyQueued()){
-			return false;
+		if(BuildOrder.getInstance().isCached(_buildingType)){
+			return  false;
 		}
 
-		if(isBuilding()){
+		if(getBuildingsOfThisTypeNotCompleted().size() > 0){
 			return false;
 		}
 
 		int usableSupply = SupplyCoordinator.getInstance().getUsableSupply();
+		if(usableSupply > Requirements.ALERT_SUPPLY_ZONE)
+			return false;
 
-		if(usableSupply <= Requirements.ALERT_SUPPLY_ZONE)
-			return true;
-		
-		return false;
+		if(isAlreadyQueued())
+			return false;
+
+		return true;
 	}
 
 	@Override
 	public boolean canBuild() {
+		BuildOrder buildOrderI = BuildOrder.getInstance();
+
 		if (BuildUtils.canGenericBuild(_buildingType)){
-			BuildOrder.getInstance().cacheBuild(_buildingType);
+			buildOrderI.cacheBuild(_buildingType);
 
 			return true;
 		}
@@ -107,5 +114,13 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	@Override
 	public List<Unit> getBuildingsOfThisType() {
 		return ListUtils.getAllIdleUnitsByType(_buildingType, _self.getUnits());
+	}
+
+	public int getSupplyDepotCount() {
+		return supplyDepotCount;
+	}
+
+	public void setSupplyDepotCount(int supplyDepotCount) {
+		this.supplyDepotCount = supplyDepotCount;
 	}
 }
