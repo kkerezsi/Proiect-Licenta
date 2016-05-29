@@ -17,7 +17,8 @@ public class WorkerCoordinator extends BaseClass {
 	private Map<Integer, ArrayList<Unit>> builderWorkers = new HashMap<Integer, ArrayList<Unit> >();
 
 	private int currentSize;
-	
+	private Unit scout = null;
+
 	private WorkerCoordinator(){
 		minerWorkers.put(0, new ArrayList<Unit>());
 		gasWorkers.put(0, new ArrayList<Unit>());
@@ -87,7 +88,7 @@ public class WorkerCoordinator extends BaseClass {
 
 								sendToGatherGas(worker, closestGasExtractor, i);
 							} else if (this.areScoutsRequired()) {
-								//send unit to scout
+								initiateScout(worker, commandCenters.get(i));
 							}
 						}
 					}
@@ -95,6 +96,15 @@ public class WorkerCoordinator extends BaseClass {
 			}
 		}
     }
+
+	private void initiateScout(Unit worker, Unit commandCenter) {
+		this.scout = worker;
+
+        if(!worker.isMoving() && !worker.isConstructing())
+		    worker.move(new Position(commandCenter.getPosition().getX() + Requirements.RELATIVE_BASE_DISTANCE ,
+			    	                 commandCenter.getPosition().getY() + Requirements.RELATIVE_BASE_DISTANCE));
+
+	}
 
 	private void sendToGatherMinerals(Unit worker, Unit closestMineral, int commandCenterIndex){
         //if a mineral patch was found, send the drone to gather it
@@ -125,7 +135,18 @@ public class WorkerCoordinator extends BaseClass {
 	}
 
 	public boolean areScoutsRequired() {
-		return false;
+		if(minerWorkers.size() <= 0)
+			return false;
+
+		if(minerWorkers.get(0).size() < Requirements.MIN_MINERS_FOR_SCOUT_SELECTION){
+			return false;
+		}
+
+		if(scout != null && !scout.exists()) {
+			return false;
+		}
+
+		return  true;
 	}
 
 	public Unit getAvailableBuilder(int commandCenterIndex){
@@ -149,8 +170,8 @@ public class WorkerCoordinator extends BaseClass {
 
         for (Unit w :
                 workers) {
-            w.move(new Position(commandCenters.get(commandCenterIndex).getPosition().getX() + 150 ,
-                                commandCenters.get(commandCenterIndex).getPosition().getY() + 150));
+            w.move(new Position(commandCenters.get(commandCenterIndex).getPosition().getX() + Requirements.RELATIVE_BASE_DISTANCE ,
+                                commandCenters.get(commandCenterIndex).getPosition().getY() + Requirements.RELATIVE_BASE_DISTANCE));
         }
 
 	}
@@ -202,4 +223,12 @@ public class WorkerCoordinator extends BaseClass {
                 || minerWorkers.get(baseIndex).contains(worker)
                 || builderWorkers.get(baseIndex).contains(worker));
     }
+
+	public Unit getScout() {
+		return scout;
+	}
+
+	public void setScout(Unit scout) {
+		this.scout = scout;
+	}
 }

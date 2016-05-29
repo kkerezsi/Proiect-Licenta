@@ -6,6 +6,6 @@ package constants.pack;
 public class Signatures {
     public static int BUILD_ACTION_SIG = 1;
     public static int MOVE_ACTION_SIG = 2;
-    public static int REQ_BUILD_ACTION_SIG = 3;
+    public static final int SCOUTING_SIGNATURE = 3;
 }
 

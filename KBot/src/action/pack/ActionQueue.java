@@ -78,4 +78,14 @@ public class ActionQueue extends BaseClass {
 
         actionQueue.removeAll(remaining);
     }
+
+    public boolean isActionQueued(int actionSignature){
+        for (Action a :
+                getActionQueue()) {
+            if (a.getSignature() == actionSignature)
+                return true;
+        }
+
+        return false;
+    }
 }
