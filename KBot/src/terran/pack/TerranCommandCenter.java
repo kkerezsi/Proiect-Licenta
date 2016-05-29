@@ -14,7 +14,8 @@ public class TerranCommandCenter extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Command_Center;
 	
 	private static TerranCommandCenter _instance;
-	
+	private int count = 0;
+
 	public static TerranCommandCenter getInstance(){
 		if(_instance == null){
 			_instance = new TerranCommandCenter();
@@ -24,6 +25,7 @@ public class TerranCommandCenter extends BaseClass implements IBuilding {
 	}
 	
 	private TerranCommandCenter(){
+		count = 1;
 	}
 	
 	@Override
@@ -34,6 +36,11 @@ public class TerranCommandCenter extends BaseClass implements IBuilding {
 	@Override
 	public List<Unit> getBuildingsOfThisTypeNotCompleted() {
 		return ListUtils.getAllUnitsNotCompleted(_buildingType);
+	}
+
+	@Override
+	public void updateCount() {
+		count = getNumberOfThisType();
 	}
 
 	@Override
@@ -55,15 +62,23 @@ public class TerranCommandCenter extends BaseClass implements IBuilding {
 	@Override
 	public int getNumberOfThisType() {
 		List<Unit> myBuildings = ListUtils.getAllUnitsByType(_buildingType, _self);
-		
+
 		if(myBuildings != null)
 			return myBuildings.size();
-		
+
 		return 0;
 	}
 
 	@Override
 	public List<Unit> getBuildingsOfThisType() {
 		return ListUtils.getAllUnitsByType(_buildingType, _self);
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
 	}
 }

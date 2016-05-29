@@ -15,7 +15,8 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Refinery;
 	
 	private static TerranRefinery _instance;
-	
+	private int count = 0;
+
 	public static TerranRefinery getInstance(){
 		if(_instance == null){
 			_instance = new TerranRefinery();
@@ -25,28 +26,30 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 	}
 	
 	private TerranRefinery(){
+		count = 0;
 	}
 	
 	@Override
 	public boolean shouldBuild() {
-		if(isBuilding()){
+		if(getBuildingsOfThisTypeNotCompleted().size() > 0){
 			return false;
 		}
 
-		List<Unit> refineries = ListUtils.getAllUnitsByType(_buildingType, _self);
-		//int battleUnits = ListUtils.getNumberOfBattleUnitsCompleted();
-		
-		if (refineries != null) {
-			int nrOfCommandCenters = TerranCommandCenter.getInstance().getNumberOfThisType();
-			int nrOfRefineries = this.getNumberOfThisType();
-			boolean isEnoughInfantry =  false; //battleUnits != 0 && (battleUnits >= Requirements.MINIMUM_MARINES);
-			boolean isAnotherBaseAndFreeMinerals = nrOfCommandCenters >= 0 &&
-					nrOfRefineries < nrOfCommandCenters  ;
-			
-			return isEnoughInfantry || isAnotherBaseAndFreeMinerals;
+		if(BuildOrder.getInstance().isCached(_buildingType)){
+			return false;
 		}
-		
-		return false;
+
+		int nrOfCommandCenters = TerranCommandCenter.getInstance().getCount();
+		int nrOfRefineries = this.getCount();
+
+		if(nrOfCommandCenters < nrOfRefineries)
+			return false;
+
+		int nrOfDepots = TerranSupplyDepot.getInstance().getCount();
+		if(nrOfDepots < nrOfCommandCenters)
+			return false;
+
+		return true;
 	}
 
 	public boolean isBuilding(){
@@ -92,7 +95,20 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 	}
 
 	@Override
+	public void updateCount() {
+		count = getNumberOfThisType();
+	}
+
+	@Override
 	public List<Unit> getBuildingsOfThisType() {
 		return ListUtils.getAllUnitsByType(_buildingType, _self);
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
 	}
 }

@@ -17,4 +17,6 @@ public interface IBuilding {
 	List<Unit> getBuildingsOfThisType();
 
 	List<Unit> getBuildingsOfThisTypeNotCompleted();
+
+	void updateCount();
 }

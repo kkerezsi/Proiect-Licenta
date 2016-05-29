@@ -1,5 +1,6 @@
 import action.pack.ActionQueue;
 import attack.pack.AttackCoordinator;
+import attack.pack.AttackStrategyCoordinator;
 import bwapi.*;
 import bwta.BWTA;
 import listUtils.pack.CodeProfiler;
@@ -35,6 +36,8 @@ public class Main extends DefaultBWListener {
         game = mirror.getGame();
         self = game.self();
         game.enableFlag(1);
+        game.sendText("black sheep wall");
+        game.sendText("/speed 20");
 
         TimeManager.getInstance();
 
@@ -51,13 +54,15 @@ public class Main extends DefaultBWListener {
         SupplyCoordinator.getInstance().init(game, self);
         ResourceCoordinator.getInstance().init(game, self);
         ScoutCoordinator.getInstance().init(game,self);
+        AttackCoordinator.getInstance().init(game,self);
+        AttackStrategyCoordinator.getInstance().init(game,self);
 
         TerranRefinery.getInstance().init(game,self);
         TerranSupplyDepot.getInstance().init(game,self);
         TerranBarracks.getInstance().init(game,self);
         TerranCommandCenter.getInstance().init(game,self);
+        TerranAcademy.getInstance().init(game,self);
 
-        AttackCoordinator.getInstance().init(game,self);
         //End register
 
         System.out.println("Analyzing map...");
@@ -103,15 +108,21 @@ public class Main extends DefaultBWListener {
             }
 
             if(getFrames() % 15 == 0){
-                CodeProfiler.startMeasuring("ActionCoordinator");
+                CodeProfiler.startMeasuring("AttackCoordinator");
                 AttackCoordinator.getInstance().runCoordinator();
-                CodeProfiler.endMeasuring("ActionCoordinator");
+                CodeProfiler.endMeasuring("AttackCoordinator");
             }
 
             if(getFrames() % 17 == 0){
                 CodeProfiler.startMeasuring("ScoutCoordinator");
-                AttackCoordinator.getInstance().runCoordinator();
+                ScoutCoordinator.getInstance().runCoordinator();
                 CodeProfiler.endMeasuring("ScoutCoordinator");
+            }
+
+            if(getFrames() % 19 == 0){
+                CodeProfiler.startMeasuring("StrategyCoordinator");
+                AttackStrategyCoordinator.getInstance().runCoordinator();
+                CodeProfiler.endMeasuring("StrategyCoordinator");
             }
 
             Painter.getInstance().paintAll();

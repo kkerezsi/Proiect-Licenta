@@ -34,4 +34,13 @@ public class ResourceCoordinator extends BaseClass {
 		
 		return resourceModel;
 	}
+
+	public boolean canAffoard(UnitType unit){
+		CompleteResourceModel res = this.getMyResources();
+
+		if(res.getMinerals() - unit.mineralPrice() >= 0 && res.getGas() - unit.gasPrice() >= 0)
+			return true;
+
+		return false;
+	}
 }

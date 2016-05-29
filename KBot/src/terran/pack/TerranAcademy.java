@@ -1,8 +1,5 @@
 package terran.pack;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import action.pack.Action;
 import action.pack.ActionQueue;
 import action.pack.BuildAction;
@@ -16,38 +13,35 @@ import contracts.pack.IBuilding;
 import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
 
-public class TerranBarracks extends BaseClass implements IBuilding {
-	private UnitType _buildingType = UnitType.Terran_Barracks;
-	
-	private static TerranBarracks _instance;
-	private int count = 0;
-	private ArrayList<Unit> barracksList;
+import java.util.List;
 
-	public static TerranBarracks getInstance(){
+public class TerranAcademy extends BaseClass implements IBuilding {
+	private UnitType _buildingType = UnitType.Terran_Academy;
+
+	private static TerranAcademy _instance;
+	private int count = 0;
+
+	public static TerranAcademy getInstance(){
 		if(_instance == null){
-			_instance = new TerranBarracks();
+			_instance = new TerranAcademy();
 		}
-		
+
 		return _instance;
 	}
-	
-	private TerranBarracks(){
+
+	private TerranAcademy(){
 		count = 0;
-		barracksList = new ArrayList<>();
 	}
 	
 	@Override
 	public boolean shouldBuild() {
-        int nrOfBarracks = getCount();
+        int nrOfAcademies = getCount();
 
 		if(isAlreadyQueued()){
 			return false;
 		}
 
-		if(TerranSupplyDepot.getInstance().getCount() < Requirements.MINIMUM_SUPPLY_DEPOTS_FOR_BARRACKS)
-			return false;
-
-        if(nrOfBarracks >= determineFibonacciReport(TerranCommandCenter.getInstance().getCount()))
+        if(nrOfAcademies == Requirements.MAX_MIN_NR_OF_ACADEMIES)
             return false;
 
 		if(getBuildingsOfThisTypeNotCompleted().size() > 0){
@@ -76,10 +70,7 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 	@Override
 	public int getNumberOfThisType() {
 		List<Unit> myBuildings = ListUtils.getAllUnitsByType(_buildingType, _self);
-
-		barracksList.clear();
-		barracksList.addAll(myBuildings);
-
+		
 		if(myBuildings != null)
 			return myBuildings.size();
 		
@@ -90,7 +81,7 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 		List<Action> buildActions = ActionQueue.getInstance().getActionsWithSignature(Signatures.BUILD_ACTION_SIG);
 		for (Action a :
 				buildActions) {
-			if(((BuildAction)a).getUnitType() == UnitType.Terran_Barracks){
+			if(((BuildAction)a).getUnitType() == _buildingType){
 				return true;
 			}
 		}
@@ -124,25 +115,11 @@ public class TerranBarracks extends BaseClass implements IBuilding {
 		count = getNumberOfThisType();
 	}
 
-	private int determineFibonacciReport(int nrOfCommandCenters){
-        switch (nrOfCommandCenters){
-            case 1: return 3;
-            case 2: return 3;
-            case 3: return 5;
-            case 4: return 8;
-            default: return 0;
-        }
-    }
-
 	public int getCount() {
 		return count;
 	}
 
 	public void setCount(int count) {
 		this.count = count;
-	}
-
-	public List<Unit> getBarracks(){
-		return barracksList;
 	}
 }

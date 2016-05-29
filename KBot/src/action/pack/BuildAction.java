@@ -4,8 +4,10 @@ import builder.pack.BuildLogicsCoordinator;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BWTA;
 import constants.pack.Requirements;
 import constants.pack.Signatures;
+import listUtils.pack.Painter;
 
 /**
  * Created by Alex on 5/1/2016.
@@ -16,7 +18,9 @@ public class BuildAction extends Action{
     private TilePosition position;
     private Boolean isConstructionFinished;
     private boolean actionStarted;
-    public BuildAction(Unit unit, UnitType buildingTypeNeeded, TilePosition position , Action nextAction){
+    private boolean isSpecialBuilding;
+
+    public BuildAction(Unit unit, UnitType buildingTypeNeeded, TilePosition position , Action nextAction, boolean isSpecialB){
         super(unit,nextAction);
 
         this.buildingTypeNeeded = buildingTypeNeeded;
@@ -25,12 +29,13 @@ public class BuildAction extends Action{
 
         this.isConstructionFinished = null;
         this.actionStarted = false;
+        this.isSpecialBuilding = isSpecialB;
     }
 
     @Override
     public void executeActions() {
         if(isConstructionFinished != null && isConstructionFinished == false) {
-            if(!unit.isConstructing()) {
+            if(!unit.isConstructing() && !unit.isMoving()) {
                 isConstructionFinished = true;
                 this.setActionExecuted(true);
             }
@@ -38,8 +43,10 @@ public class BuildAction extends Action{
         else {
             if (isPreconditionPassed() && isConditionPassed()) {
                 if (!unit.isConstructing() && !actionStarted) {
-                    this.unit.build(buildingTypeNeeded, position);
-                    this.actionStarted = true;
+                    if(this.unit.build(buildingTypeNeeded, position))
+                        this.actionStarted = true;
+                    else
+                        Painter.getInstance().paintPosition(position);
                 }else {
                     isConstructionFinished = false;
                 }
@@ -52,11 +59,14 @@ public class BuildAction extends Action{
         if(isActionExecuted())
             return true;
 
-        if(!BuildLogicsCoordinator.getInstance().canBuildAt(position,buildingTypeNeeded)){
+        if(!isSpecialBuilding && !BuildLogicsCoordinator.getInstance().canBuildAt(position,buildingTypeNeeded)){
             this.position = BuildLogicsCoordinator.getInstance().getLegitTileToBuildNear(buildingTypeNeeded, position, 6, Requirements.MAX_SEARCH_RANGE);
 
             return false;
         }
+
+        if(unit.isMoving())
+            return false;
 
         if(unit.isConstructing())
             return false;

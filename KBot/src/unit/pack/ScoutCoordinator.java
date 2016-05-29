@@ -1,6 +1,7 @@
 package unit.pack;
 
 import action.pack.ActionQueue;
+import action.pack.ScoutingAction;
 import base.BaseClass;
 import base.Tuple;
 import bwapi.Game;
@@ -18,11 +19,11 @@ public class ScoutCoordinator extends BaseClass {
 
 	private ArrayList<Tuple<BaseLocation,Boolean>> availableLocations;
 	private Unit scout;
+	private WorkerCoordinator worckerCoordI;
 
 	private ScoutCoordinator(){
-		scout = WorkerCoordinator.getInstance().getScout();
-
 		availableLocations = new ArrayList<>();
+		worckerCoordI = WorkerCoordinator.getInstance();
 
 		for (BaseLocation base : BWTA.getBaseLocations()) {
 			availableLocations.add(new Tuple<>(base, false));
@@ -39,11 +40,13 @@ public class ScoutCoordinator extends BaseClass {
 	
 	public void runCoordinator(){
 		ActionQueue queue = ActionQueue.getInstance();
-		if(scout != null && scout.exists() && scout.isIdle()
-				&& queue.isActionQueued(Signatures.SCOUTING_SIGNATURE)){
+		scout = worckerCoordI.getScout();
+
+		if(availableLocations.size() > 0 && availableLocations.get(0).y == true)
+			availableLocations.remove(0);
+		else if(scout != null && scout.exists() && !queue.isActionQueued(Signatures.SCOUTING_SIGNATURE)){
 			if(availableLocations.size() > 0 ){
 				Tuple<BaseLocation,Boolean> first = availableLocations.get(0);
-
 				queue.enqueueAction(new ScoutingAction(scout, first));
 			}
 		}

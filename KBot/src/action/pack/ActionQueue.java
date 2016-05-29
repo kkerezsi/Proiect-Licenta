@@ -15,8 +15,10 @@ public class ActionQueue extends BaseClass {
     private static ActionQueue _instance;
 
     private Queue<Action> actionQueue;
+    List<Action> remaining;
     private ActionQueue(){
         this.setActionQueue(new LinkedList<Action>());
+        remaining = new ArrayList<>();
     }
 
     public static ActionQueue getInstance(){
@@ -66,7 +68,7 @@ public class ActionQueue extends BaseClass {
     }
 
     public void executeActions(){
-        List<Action> remaining = new ArrayList<>();
+        remaining.clear();
 
         for (Action action:
              this.actionQueue) {

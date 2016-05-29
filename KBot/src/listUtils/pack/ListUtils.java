@@ -352,16 +352,50 @@ public class ListUtils {
 		return  nearestUnits;
 	}
 
+	public static List<Unit> getNearestNeutralUnitsTo(TilePosition tile, UnitType unitType, double searchRange) {
+
+		ArrayList<Unit> nearestUnits = new ArrayList<>();
+
+		for (Unit unit :
+				_game.getNeutralUnits()) {
+			if(unit.getType() == unitType &&
+					unit.getDistance(tile.toPosition()) <= searchRange &&
+					unit.isCompleted()
+					){
+				nearestUnits.add(unit);
+			}
+		}
+
+		return  nearestUnits;
+	}
+
 	public static List<Unit> getAllUnitsNotCompleted(UnitType buildingType) {
 		List<Unit> units = _self.getUnits();
 		ArrayList<Unit> notComplUnits = new ArrayList<>();
 		for (Unit u :
 				units) {
-			if(!u.isCompleted() || u.isBeingConstructed()){
+			if(u.isBeingConstructed()){
 				notComplUnits.add(u);
 			}
 		}
 
 		return notComplUnits;
+	}
+
+	public static Unit getClosestNonBuildingUnits(Unit closest, List<Unit> units) {
+		Unit selectedTarget = units.size() > 0 ? units.get(0) : null;
+
+		if(selectedTarget != null) {
+			for (Unit u :
+					units) {
+				if (closest.getDistance(u) < closest.getDistance(selectedTarget)) {
+					selectedTarget = u;
+				}
+			}
+
+			return selectedTarget;
+		}
+
+		return  null;
 	}
 }

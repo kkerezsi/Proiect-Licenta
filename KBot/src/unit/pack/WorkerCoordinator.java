@@ -9,6 +9,7 @@ import base.BaseClass;
 import bwapi.*;
 import constants.pack.Requirements;
 import listUtils.pack.ListUtils;
+import terran.pack.TerranRefinery;
 
 public class WorkerCoordinator extends BaseClass {
 	private static WorkerCoordinator _instance = null;
@@ -42,6 +43,9 @@ public class WorkerCoordinator extends BaseClass {
 	}
 	
 	public boolean areGasWorkersRequired(int commandCenterIndex){
+		if(TerranRefinery.getInstance().getCount() == 0)
+			return false;
+
 		return gasWorkers.get(commandCenterIndex).size() <  Requirements.MAX_NR_GAS_WORKERS_ON_BASE;
 	}
 
@@ -49,8 +53,7 @@ public class WorkerCoordinator extends BaseClass {
         int mineralWorkersCount = minerWorkers.get(commandCenterIndex).size();
         int builderWorkersCount = builderWorkers.get(commandCenterIndex).size();
 
-		return (builderWorkersCount < Requirements.MAX_NR_BASE_BUILDERS)
-			|| (mineralWorkersCount % Requirements.MAX_NR_MINING_WORKERS_WITHOUT_BUILDER == 0);
+		return (builderWorkersCount < Requirements.MAX_NR_BASE_BUILDERS);
 	}
 
 	public void runWorkers(){
@@ -76,8 +79,7 @@ public class WorkerCoordinator extends BaseClass {
 						if (!isWorkerInAnyCategory(i,worker)) {
 							if (this.areMinerWorkersRequired(i)) {
 								if (closestMineral == null) {
-									closestMineral = ListUtils.getClosestUnit(_game.getMinerals(), commandCenters.get(i),
-											UnitType.Resource_Mineral_Field);
+									closestMineral = ListUtils.getNearestNeutralUnitsTo(tile, UnitType.Resource_Mineral_Field, Requirements.SEARCH_RANGE_WORKERS).get(0);
 								}
 
 								sendToGatherMinerals(worker, closestMineral, i);
@@ -87,8 +89,10 @@ public class WorkerCoordinator extends BaseClass {
 								}
 
 								sendToGatherGas(worker, closestGasExtractor, i);
-							} else if (this.areScoutsRequired()) {
-								initiateScout(worker, commandCenters.get(i));
+							}
+
+							if (this.areScoutsRequired()) {
+								initiateScout(worker, commandCenters.get(i), i);
 							}
 						}
 					}
@@ -97,10 +101,11 @@ public class WorkerCoordinator extends BaseClass {
 		}
     }
 
-	private void initiateScout(Unit worker, Unit commandCenter) {
+	private void initiateScout(Unit worker, Unit commandCenter, int commandCenterIndex) {
 		this.scout = worker;
 
-        if(!worker.isMoving() && !worker.isConstructing())
+		removeFromMinersOrExtractors(worker, commandCenterIndex);
+        if(!worker.isConstructing())
 		    worker.move(new Position(commandCenter.getPosition().getX() + Requirements.RELATIVE_BASE_DISTANCE ,
 			    	                 commandCenter.getPosition().getY() + Requirements.RELATIVE_BASE_DISTANCE));
 
@@ -135,14 +140,14 @@ public class WorkerCoordinator extends BaseClass {
 	}
 
 	public boolean areScoutsRequired() {
+		if(scout != null && scout.exists()) {
+			return false;
+		}
+
 		if(minerWorkers.size() <= 0)
 			return false;
 
 		if(minerWorkers.get(0).size() < Requirements.MIN_MINERS_FOR_SCOUT_SELECTION){
-			return false;
-		}
-
-		if(scout != null && !scout.exists()) {
 			return false;
 		}
 
@@ -230,5 +235,11 @@ public class WorkerCoordinator extends BaseClass {
 
 	public void setScout(Unit scout) {
 		this.scout = scout;
+	}
+
+	public boolean checkIfNewUnitsAdded(){
+		int stateUnitsCount = _self.getUnits().size();
+
+		return stateUnitsCount != currentSize;
 	}
 }

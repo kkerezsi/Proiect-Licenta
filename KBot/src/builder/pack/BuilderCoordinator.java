@@ -41,8 +41,9 @@ public class BuilderCoordinator extends BaseClass {
 						TilePosition tile = BuildLogicsCoordinator.getInstance().determineSpecialBuildPosition(building.getUnitType());
 
 						if (tile != null) {
-							scv.build(building.getUnitType(), tile);
 							BuildOrder.getInstance().getNextBuilding();
+							ActionQueue.getInstance().enqueueAction(
+									new BuildAction(scv, building.getUnitType(), tile, null, true));
 						}
 					} else {
 						Painter.getInstance().clearTiles();
@@ -51,7 +52,7 @@ public class BuilderCoordinator extends BaseClass {
 						if (tile != null) {
 							BuildOrder.getInstance().getNextBuilding();
 							ActionQueue.getInstance().enqueueAction(
-									new BuildAction(scv, building.getUnitType(), tile, null));
+									new BuildAction(scv, building.getUnitType(), tile, null, false));
 						}
 					}
 				}

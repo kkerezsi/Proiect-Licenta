@@ -67,9 +67,10 @@ public class SupplyCoordinator extends BaseClass {
 	}
 
 	public void populateBuilders(List<Unit> supplyBuilders, int baseIndex) {
-		Unit builder = ListUtils.getNearestWorkerTo(supplyBuilders.get(baseIndex).getTilePosition());
-		WorkerCoordinator workerCInstance =  WorkerCoordinator.getInstance();
+		List<Unit> builderList = ListUtils.getNearestUnitsTo(supplyBuilders.get(baseIndex).getTilePosition(),UnitType.Terran_SCV,Requirements.SEARCH_RANGE_WORKERS);
+		Unit builder = builderList.size() > 0 ? builderList.get(0) : null;
 
+		WorkerCoordinator workerCInstance =  WorkerCoordinator.getInstance();
 		workerCInstance.removeFromMinersOrExtractors(builder, baseIndex);
 		if( builder != null ) {
 			builder.move(new Position(supplyBuilders.get(baseIndex).getPosition().getX() + 150 , supplyBuilders.get(baseIndex).getPosition().getY() + 150));

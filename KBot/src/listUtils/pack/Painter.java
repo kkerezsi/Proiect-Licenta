@@ -96,4 +96,11 @@ public class Painter extends BaseClass {
 	}
 
 
+	public void paintUnit(Unit unit) {
+		_game.drawTextMap(unit.getX(), unit.getY(), unit.getPoint().toTilePosition().toString());
+	}
+
+	public void paintPosition(TilePosition tile) {
+		_game.drawTextMap(tile.getX(), tile.getY(), tile.toString());
+	}
 }

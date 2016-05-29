@@ -5,6 +5,7 @@ import builder.pack.BuildOrder;
 import builder.pack.Building;
 import bwapi.Unit;
 import listUtils.pack.ListUtils;
+import unit.pack.WorkerCoordinator;
 
 import java.util.ArrayList;
 
@@ -27,6 +28,7 @@ public class TerranBuildingAnalyzer extends BaseClass {
     }
 
     public void runAnalyzer(){
+        updateCount();
 
         if(BuildOrder.getInstance().peekNextBuilding() == null) {
             if (TerranSupplyDepot.getInstance().shouldBuild()) {
@@ -41,9 +43,23 @@ public class TerranBuildingAnalyzer extends BaseClass {
                 TerranRefinery.getInstance().canBuild();
             }
 
+            else if (TerranAcademy.getInstance().shouldBuild()){
+                TerranAcademy.getInstance().canBuild();
+            }
+
             else if (TerranCommandCenter.getInstance().shouldBuild()) {
                 TerranCommandCenter.getInstance().canBuild();
             }
+        }
+    }
+
+    public void updateCount(){
+        if(WorkerCoordinator.getInstance().checkIfNewUnitsAdded()) {
+            TerranCommandCenter.getInstance().updateCount();
+            TerranBarracks.getInstance().updateCount();
+            TerranSupplyDepot.getInstance().updateCount();
+            TerranRefinery.getInstance().updateCount();
+            TerranAcademy.getInstance().updateCount();
         }
     }
 }

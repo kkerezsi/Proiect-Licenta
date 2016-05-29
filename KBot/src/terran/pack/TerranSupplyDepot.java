@@ -15,13 +15,14 @@ import constants.pack.Signatures;
 import contracts.pack.IBuilding;
 import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
+import unit.pack.WorkerCoordinator;
 
 public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Supply_Depot;
 	
 	private static TerranSupplyDepot _instance;
 
-	private int supplyDepotCount;
+	private int count = 0;
 
 	public static TerranSupplyDepot getInstance(){
 		if(_instance == null){
@@ -32,7 +33,7 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	}
 
 	private TerranSupplyDepot(){
-		supplyDepotCount = 0;
+		count = 0;
 	}
 	
 	@Override
@@ -45,11 +46,15 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 			return false;
 		}
 
-		int usableSupply = SupplyCoordinator.getInstance().getUsableSupply();
-		if(usableSupply > Requirements.ALERT_SUPPLY_ZONE)
+		if(isAlreadyQueued())
 			return false;
 
-		if(isAlreadyQueued())
+		if(getCount() == 0 && WorkerCoordinator.getInstance().getBuilders(0).size() == 1) {
+			return true;
+		}
+
+		int usableSupply = SupplyCoordinator.getInstance().getUsableSupply();
+		if(usableSupply > Requirements.ALERT_SUPPLY_ZONE)
 			return false;
 
 		return true;
@@ -112,15 +117,20 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	}
 
 	@Override
+	public void updateCount() {
+		count = getNumberOfThisType();
+	}
+
+	@Override
 	public List<Unit> getBuildingsOfThisType() {
 		return ListUtils.getAllIdleUnitsByType(_buildingType, _self.getUnits());
 	}
 
-	public int getSupplyDepotCount() {
-		return supplyDepotCount;
+	public int getCount() {
+		return count;
 	}
 
-	public void setSupplyDepotCount(int supplyDepotCount) {
-		this.supplyDepotCount = supplyDepotCount;
+	public void setCount(int count) {
+		this.count = count;
 	}
 }

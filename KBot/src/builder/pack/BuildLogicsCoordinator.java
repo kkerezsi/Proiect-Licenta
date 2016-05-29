@@ -38,11 +38,11 @@ public class BuildLogicsCoordinator extends BaseClass {
             }
         }
 
-        if (unit == UnitType.Terran_Bunker) {
+        else if (unit == UnitType.Terran_Bunker) {
 
         }
 
-        if (unit == UnitType.Terran_Command_Center) {
+        else if (unit == UnitType.Terran_Command_Center) {
 
         }
 
