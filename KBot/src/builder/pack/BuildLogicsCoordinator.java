@@ -136,23 +136,7 @@ public class BuildLogicsCoordinator extends BaseClass {
                 // - too close to a chokepoint (passage problem)
                 // - that are in other region (wrong neighborhood)
 
-                if (!isBase && type != UnitType.Terran_Bunker && isTooNearMineralsOrGeyser(type, place)) {
-                    return null;
-                }
-
                 if (!isBase && !isEnoughPlaceToOtherBuildings(place, type)) {
-                    return null;
-                }
-
-                if (!isBase && isOverlappingNextBase(place, type)) {
-                    return null;
-                }
-
-                if (!isBase && isTooCloseToAnyChokePoint(place)) {
-                    return null;
-                }
-
-                if (!isBase && !skipCheckingRegion && !isInAllowedRegions(place)) {
                     return null;
                 }
 
@@ -224,11 +208,12 @@ public class BuildLogicsCoordinator extends BaseClass {
 
     public boolean canBuildAt(TilePosition point, UnitType type) {
         Unit builder = ListUtils.getNearestWorkerTo(point);
-        if (builder == null || point == null) {
-            return false;
-        }
 
-        // builder.getID(),
+        if(builder == null)
+            return false;
+
+        Painter.getInstance().addTile(point.getPoint().getX(), point.getPoint().getY());
+
         return _game.canBuildHere(point.getPoint(), type);
     }
 

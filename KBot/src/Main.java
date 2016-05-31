@@ -37,7 +37,7 @@ public class Main extends DefaultBWListener {
         self = game.self();
         game.enableFlag(1);
         game.sendText("black sheep wall");
-        game.sendText("/speed 20");
+        game.sendText("power overwhelming");
 
         TimeManager.getInstance();
 
@@ -125,6 +125,7 @@ public class Main extends DefaultBWListener {
                 CodeProfiler.endMeasuring("StrategyCoordinator");
             }
 
+            //WorkerCoordinator.getInstance().checkIfNewUnitsAdded();
             Painter.getInstance().paintAll();
         }
         catch (Exception ex){

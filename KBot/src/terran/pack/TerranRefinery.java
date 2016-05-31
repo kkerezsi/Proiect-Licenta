@@ -42,7 +42,7 @@ public class TerranRefinery extends BaseClass implements IBuilding {
 		int nrOfCommandCenters = TerranCommandCenter.getInstance().getCount();
 		int nrOfRefineries = this.getCount();
 
-		if(nrOfCommandCenters < nrOfRefineries)
+		if(nrOfCommandCenters <= nrOfRefineries)
 			return false;
 
 		int nrOfDepots = TerranSupplyDepot.getInstance().getCount();

@@ -95,7 +95,7 @@ public class ListUtils {
 	
 	public static Unit getFirstIdleUnit(List<Unit> units){
 		for (Unit u : units) {
-			if(u.isIdle() && u.isCompleted())
+			if((u.isIdle() || u.isGatheringGas() || u.isGatheringMinerals() || u.isMoving()) && u.isCompleted())
 				return u;
 		}
 		
@@ -262,6 +262,8 @@ public class ListUtils {
 	}
 
     public static Unit getNearestWorkerTo(TilePosition place) {
+		if(place == null)
+			return  null;
         return getUnitNearestFromList(place.getX(), place.getY(), _self.getUnits(), true, false);
     }
 
@@ -388,7 +390,7 @@ public class ListUtils {
 		if(selectedTarget != null) {
 			for (Unit u :
 					units) {
-				if (closest.getDistance(u) < closest.getDistance(selectedTarget)) {
+				if (closest.getDistance(u) < closest.getDistance(selectedTarget) && selectedTarget.isVisible()) {
 					selectedTarget = u;
 				}
 			}

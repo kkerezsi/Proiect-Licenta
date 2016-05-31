@@ -28,6 +28,9 @@ public class AttackStrategyCoordinator extends BaseClass {
 	public void runCoordinator(){
 		List<Unit> myArmy = AttackCoordinator.getInstance().getArmy();
 
+		attackLaunched = !(myArmy.size() >= Requirements.MIN_ARMY_ATTACK_SIZE
+				&& (enemyTarget == null || (enemyTarget != null && !enemyTarget.exists()) || myArmy.get(0).isIdle()));
+
 		if(!attackLaunched && ( myArmy.size() >= Requirements.MIN_ARMY_ATTACK_SIZE)){
 			enemyTarget = !attackLaunched ? ListUtils.getClosestNonBuildingUnits( myArmy.get(0) ,_game.enemy().getUnits()): enemyTarget;
 
@@ -44,7 +47,7 @@ public class AttackStrategyCoordinator extends BaseClass {
 			}
 		}
 		else if(attackLaunched && ( myArmy.size() >= 0 )){
-			if(!enemyTarget.exists())
+			if(enemyTarget != null && !enemyTarget.exists())
 				attackLaunched = false;
 		}
 	}

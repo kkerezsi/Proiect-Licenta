@@ -49,6 +49,9 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		if(isAlreadyQueued())
 			return false;
 
+		if(getCount() == 1 && TerranBarracks.getInstance().getCount() == 0)
+			return false;
+
 		if(getCount() == 0 && WorkerCoordinator.getInstance().getBuilders(0).size() == 1) {
 			return true;
 		}

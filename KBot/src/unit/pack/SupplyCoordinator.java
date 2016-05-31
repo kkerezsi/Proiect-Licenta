@@ -32,10 +32,9 @@ public class SupplyCoordinator extends BaseClass {
 		WorkerCoordinator wCoordInstance = WorkerCoordinator.getInstance();
 		ResourceCoordinator resCInstance = ResourceCoordinator.getInstance();
 		for (int i = 0; i < supplyBuilders.size(); i++) {
-			if(WorkerCoordinator.getInstance().areMinerWorkersRequired(i)
-					|| wCoordInstance.areGasWorkersRequired(i)
-					|| wCoordInstance.areBuildersRequired(i)
-					|| wCoordInstance.areScoutsRequired()){
+			if(wCoordInstance.areMinerWorkersRequired(i)
+			|| wCoordInstance.areGasWorkersRequired(i)
+			|| wCoordInstance.areBuildersRequired(i)){
 
 				if(resCInstance.getMyResources().getMinerals() > (100* (wCoordInstance.getBuilders(i).size() + 1))
 						&& wCoordInstance.getBuilders(i).size() < Requirements.MAX_NR_BASE_BUILDERS) {
@@ -67,13 +66,14 @@ public class SupplyCoordinator extends BaseClass {
 	}
 
 	public void populateBuilders(List<Unit> supplyBuilders, int baseIndex) {
+		WorkerCoordinator workerCInstance =  WorkerCoordinator.getInstance();
 		List<Unit> builderList = ListUtils.getNearestUnitsTo(supplyBuilders.get(baseIndex).getTilePosition(),UnitType.Terran_SCV,Requirements.SEARCH_RANGE_WORKERS);
 		Unit builder = builderList.size() > 0 ? builderList.get(0) : null;
 
-		WorkerCoordinator workerCInstance =  WorkerCoordinator.getInstance();
-		workerCInstance.removeFromMinersOrExtractors(builder, baseIndex);
 		if( builder != null ) {
-			builder.move(new Position(supplyBuilders.get(baseIndex).getPosition().getX() + 150 , supplyBuilders.get(baseIndex).getPosition().getY() + 150));
+			workerCInstance.removeFromMinersOrExtractors(builder, baseIndex);
+			if(builder.isIdle())
+				builder.move(new Position(supplyBuilders.get(baseIndex).getPosition().getX() + 150 , supplyBuilders.get(baseIndex).getPosition().getY() + 150));
 			workerCInstance.getBuilders(baseIndex).add(builder);
 		}
 	}

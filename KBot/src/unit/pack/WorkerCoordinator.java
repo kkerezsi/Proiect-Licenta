@@ -50,7 +50,6 @@ public class WorkerCoordinator extends BaseClass {
 	}
 
 	public boolean areBuildersRequired(int commandCenterIndex) {
-        int mineralWorkersCount = minerWorkers.get(commandCenterIndex).size();
         int builderWorkersCount = builderWorkers.get(commandCenterIndex).size();
 
 		return (builderWorkersCount < Requirements.MAX_NR_BASE_BUILDERS);
@@ -58,10 +57,7 @@ public class WorkerCoordinator extends BaseClass {
 
 	public void runWorkers(){
 		//filter all worker units
-		int stateUnitsCount = _self.getUnits().size();
-
-		if(stateUnitsCount != currentSize) {
-			currentSize = stateUnitsCount;
+		//if(checkIfNewUnitsAdded()) {
 			ArrayList<Unit> commandCenters = ListUtils.getMyCommandCenters();
 
 			//handle idle units
@@ -90,15 +86,11 @@ public class WorkerCoordinator extends BaseClass {
 
 								sendToGatherGas(worker, closestGasExtractor, i);
 							}
-
-							if (this.areScoutsRequired()) {
-								initiateScout(worker, commandCenters.get(i), i);
-							}
 						}
 					}
 				}
 			}
-		}
+		//}
     }
 
 	private void initiateScout(Unit worker, Unit commandCenter, int commandCenterIndex) {
@@ -173,11 +165,15 @@ public class WorkerCoordinator extends BaseClass {
 		builderWorkers.get(commandCenterIndex).clear();
 		builderWorkers.get(commandCenterIndex).addAll(workers);
 
-        for (Unit w :
-                workers) {
-            w.move(new Position(commandCenters.get(commandCenterIndex).getPosition().getX() + Requirements.RELATIVE_BASE_DISTANCE ,
-                                commandCenters.get(commandCenterIndex).getPosition().getY() + Requirements.RELATIVE_BASE_DISTANCE));
-        }
+//		Position pos = null;
+//		if(workers.size() > 0)
+//			pos = new Position(commandCenters.get(commandCenterIndex).getPosition().getX() + Requirements.RELATIVE_BASE_DISTANCE ,
+//					commandCenters.get(commandCenterIndex).getPosition().getY() + Requirements.RELATIVE_BASE_DISTANCE);
+//        for (Unit w :
+//                workers) {
+//			if(!w.isConstructing() && w.getPosition().getX() != pos.getX() && w.getY() != pos.getY())
+//				w.move(pos);
+//        }
 
 	}
 
@@ -240,6 +236,11 @@ public class WorkerCoordinator extends BaseClass {
 	public boolean checkIfNewUnitsAdded(){
 		int stateUnitsCount = _self.getUnits().size();
 
-		return stateUnitsCount != currentSize;
+		if(stateUnitsCount != currentSize){
+			currentSize = stateUnitsCount;
+			return true;
+		}
+
+		return false;
 	}
 }

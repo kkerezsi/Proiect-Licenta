@@ -6,7 +6,7 @@ public class Requirements {
 	public static final int MIN_MINERS_FOR_SCOUT_SELECTION = 9;
 	public static final int RELATIVE_BASE_DISTANCE = 150;
 	public static final int MAX_MIN_NR_OF_ACADEMIES = 1;
-	public static final int MIN_ARMY_ATTACK_SIZE = 15;
+	public static final int MIN_ARMY_ATTACK_SIZE = 50;
 
 	public static int MAX_NR_MINING_WORKERS_ON_BASE = 10;
 	public static int MAX_NR_GAS_WORKERS_ON_BASE = 3;

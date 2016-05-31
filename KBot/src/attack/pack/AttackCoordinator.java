@@ -34,10 +34,11 @@ public class AttackCoordinator extends BaseClass{
 	}
 	
 	public void runCoordinator(){
-		if(WorkerCoordinator.getInstance().checkIfNewUnitsAdded()) {
-			updateArmy();
-		}
-		else if(TerranBarracks.getInstance().getCount() > 0){
+		//if(WorkerCoordinator.getInstance().checkIfNewUnitsAdded()) {
+		updateArmy();
+		//}
+
+		if(TerranBarracks.getInstance().getCount() > 0){
 
 			List<Unit> availableBarracks = TerranBarracks.getInstance().getBarracks();
 
