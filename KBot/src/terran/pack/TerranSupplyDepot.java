@@ -17,11 +17,15 @@ import listUtils.pack.BuildUtils;
 import listUtils.pack.ListUtils;
 import unit.pack.WorkerCoordinator;
 
+//Each class is created as a singleton
+//They implement BaseClass in order to
+//get full access of the game input data
 public class TerranSupplyDepot extends BaseClass implements IBuilding {
 	private UnitType _buildingType = UnitType.Terran_Supply_Depot;
 	
 	private static TerranSupplyDepot _instance;
 
+	//Unit Controllers keep an overall track of when a unit is beeing added
 	private int count = 0;
 
 	public static TerranSupplyDepot getInstance(){
@@ -36,6 +40,8 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		count = 0;
 	}
 	
+	//A primary method for the building units is the should build method
+	//The method provides a boolean value weather the deapot is required or not
 	@Override
 	public boolean shouldBuild() {
 		if(BuildOrder.getInstance().isCached(_buildingType)){
@@ -63,6 +69,8 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		return true;
 	}
 
+	//Can build method caches the building and sets an awaiting
+	//for a builder worker to pick it up
 	@Override
 	public boolean canBuild() {
 		BuildOrder buildOrderI = BuildOrder.getInstance();
@@ -76,6 +84,7 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		return false;
 	}
 
+	//checks if any building action has already been queued
 	public boolean isAlreadyQueued(){
 		List<Action> buildActions = ActionQueue.getInstance().getActionsWithSignature(Signatures.BUILD_ACTION_SIG);
 		for (Action a :
@@ -88,6 +97,7 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		return  false;
 	}
 
+	//provides a check for currently building units of this type
 	public boolean isBuilding(){
 		List<Unit> unitsOfThisType = this.getBuildingsOfThisType();
 
@@ -99,11 +109,13 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		return false;
 	}
 
+	//force build 
 	@Override
 	public void forceBuild() {
 		BuildOrder.getInstance().cacheBuild(_buildingType);
 	}
 
+	//Provides the number of units of this type available for the player
 	@Override
 	public int getNumberOfThisType() {
 		List<Unit> myBuildings = ListUtils.getAllIdleUnitsByType(_buildingType, _self.getUnits());
@@ -114,25 +126,30 @@ public class TerranSupplyDepot extends BaseClass implements IBuilding {
 		return 0;
 	}
 
+	//Get buildings that are not completed
 	@Override
 	public List<Unit> getBuildingsOfThisTypeNotCompleted() {
 		return ListUtils.getAllUnitsNotCompleted(_buildingType);
 	}
 
+	//Updates the current number of buildings of this type
 	@Override
 	public void updateCount() {
 		count = getNumberOfThisType();
 	}
 
+	//Gets the objects of this type 
 	@Override
 	public List<Unit> getBuildingsOfThisType() {
 		return ListUtils.getAllIdleUnitsByType(_buildingType, _self.getUnits());
 	}
 
+	//provides the count of my units of this type
 	public int getCount() {
 		return count;
 	}
 
+	//sets the count for the counter
 	public void setCount(int count) {
 		this.count = count;
 	}

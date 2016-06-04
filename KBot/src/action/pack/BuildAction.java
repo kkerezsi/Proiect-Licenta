@@ -32,6 +32,9 @@ public class BuildAction extends Action{
         this.isSpecialBuilding = isSpecialB;
     }
 
+    // if construction has not started, we check for pre and post conditions
+    // in order to create a reliable real time system of data checking
+    // After the building has been built, mark action as executed
     @Override
     public void executeActions() {
         if(isConstructionFinished != null && isConstructionFinished == false) {
