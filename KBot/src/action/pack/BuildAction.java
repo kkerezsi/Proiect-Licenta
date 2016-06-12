@@ -49,7 +49,7 @@ public class BuildAction extends Action{
                     if(this.unit.build(buildingTypeNeeded, position))
                         this.actionStarted = true;
                     else
-                        Painter.getInstance().paintPosition(position);
+                        ActionQueue.getInstance().getActionQueue().remove(this);
                 }else {
                     isConstructionFinished = false;
                 }
